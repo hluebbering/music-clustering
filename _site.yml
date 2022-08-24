@@ -1,0 +1,8 @@
+name: "Data-Programming"
+navbar:
+  title: "Python Data Programming"
+  right:
+    - icon: fa-home
+      href: https://hluebbering.github.io
+    - icon: fa-github
+      href: https://github.com/hluebbering

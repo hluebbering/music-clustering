@@ -1,0 +1,382 @@
+---
+title: "Data Programming with Python"
+author: "Hannah Luebbering"
+date: "July 04, 2022"
+output: 
+  html_document: 
+    css: "assets/main2.css"
+    toc: yes
+    toc_float: yes
+knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "docs") })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, out.width = "80%")
+library(kableExtra)
+library(knitr)
+library(ggplot2)
+library(hrbrthemes)
+library(lubridate)
+library(GGally)
+library(ggrepel)
+library(spotifyr)
+library(tidyverse)
+
+#source("data.R")
+```
+
+
+
+<script src="assets/min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="assets/pymin.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+```{r}
+playlists_df <- read.csv('scripts/playlists.csv')
+head(playlists_df)
+```
+
+
+
+
+
+```{python}
+import csv
+
+df = open('scripts/playlists.csv')
+csv_reader = csv.DictReader(df)
+
+all_artists = []
+for row in csv_reader:
+  all_artists.append(row['artist_name'])
+
+
+new_dict = {}
+
+for i in all_artists:
+  if i in new_dict.keys():
+    new_dict[i] += 1
+  else:
+    new_dict[i] = 1
+  
+
+
+y = {k: v for k, v in sorted(new_dict.items(), key=lambda x: (x[1], x[0]), reverse=True)[1:20]}
+
+print(y)
+
+```
+
+
+
+
+
+## Comparing Multiple Playlists
+
+
+
+<span class = "myhighlight">Overview:</span> Given a list of playlists, find all duplicated songs.
+
+
+
+
+### Part 1.
+
+
+Write a function called `common_artists(artists)` that takes in a list of sets representing musical artist names and returns a float representing the fraction of common artists shared among the sets. The **fraction of common artists** is the number of shared artists divided by the total number of unique artists that appeared across all sets. 
+
+
+Our assumptions include that the given list `artists` contains at least one set, although the length of the set may or may not be empty. In the case that artists contains at least one empty set, return 0.0.
+
+
+
+
+Here are a few examples that your function will be expected to produce:
+
+
+
+
+<div class="roundedlist">
+
+For example, suppose the given list of sets is 
+
+
+```bash
+[{"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus"}, {"Kanye West", "Justin Bieber"}]
+```
+
+- There is one artist (Kanye West) shared across all sets while there are four unique artists (Kanye West, Post Malone, Miley Cyrus, and Justin Bieber). Thus, our fraction of common artists percentage is $1/4 = 0.25$.
+
+
+</div>
+
+
+
+
+
+
+
+
+By definition, a set is a data structure that contains values where order does not matter and there're no duplicates. To find common elements in both set1 and set2, we run `set1 & set2`.
+
+
+
+<div class = "termy">
+
+
+
+```{python}
+def common_artists(artists):
+  # Create empty dictionary for unique artists
+  artist_counts = dict()
+  
+  # Loop through list of sets
+  for a_set in artists:
+    
+    # Loop through names in set
+    for name in a_set:
+      
+      # Update current artist's count
+      if name in artist_counts:
+        artist_counts[name] += 1
+      else:
+        artist_counts[name] = 1
+  
+  # Total number of unique artists across all sets
+  unique_artists = len(artist_counts)
+  shared_artists = 0
+  
+  # Find artists shared across all sets
+  for freq in artist_counts.values():
+    if freq == len(artists):
+      shared_artists += 1
+      
+      
+  return(float(shared_artists / unique_artists))
+```
+
+
+
+```{python}
+common_artists([{"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus", "Post Malone"},  {"Kanye West", "Justin Bieber"}])
+common_artists([{"(G)I-DLE"}])
+common_artists([{"IU"}, {}])
+```
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------
+
+
+
+
+
+### Part 2.
+
+
+<span class = "myhighlight5">Problem 2</span>
+
+
+Write a function called `explore_seattle(seattle_map, curr_location)`, where `seattle_map` is a list of tuples. Each tuple has two elements: the first element is the name of the location and the second element is a tuple containing the x and y-coordinates of the given location. `curr_location` is a tuple giving your x and y-coordinates of your location.
+
+
+You will want to calculate the distance between you and all of the locations and return a list of all the location names. This list should be sorted first by distance between you and the location in ascending order, and any ties in distance are broken by alphabetical order of the location names.
+
+
+
+
+
+
+
+
+The **euclidean distance** is a simple way to calculate the distance between two data points representing the $x$ and $y$-coordinates of the given location. To calculate the euclidean distance, we use the Pythagorean theorem. If we have two data points $a=\left[a_1, a_2, \ldots , a_n\right]$ and $b=\left[b_1, b_2, \ldots , b_n\right]$, where $n$ is the dimension, we define the euclidean distance between both points as
+
+$$
+\begin{align}
+D (a,b) &=
+\sqrt{(a_1 - b_1)^2 + (a_2-b_2)^2 + \ldots + (a_n-b_n)^2}
+\end{align}
+$$
+
+
+Here are a few examples that your function will be expected to produce:
+
+
+<div class = "roundedlist">
+
+```python
+explore_seattle([("Suzzallo Library", (1, 1)), ("Paul G. Allen School", (3, 5))], (7, 4)) should return ["Paul G. Allen School", "Suzzallo Library"]
+```
+</div>
+
+
+explore_seattle([("Snowy Village", (10, 0)), ("Tea Republik", (0, 0))], (3, 4)) should return ["Tea Republik", "Snowy Village"]
+explore_seattle([("Henry Art Gallery", (1, 0)), ("Museum of Museums", (0, 1), ("Seattle Art Museum", (-1, 0))], (0, 0)) should return ["Henry Art Gallery", "Museum of Museums", "Seattle Art Museum"]
+
+
+
+By definition, tuples are immutable, which means that we cannot change elements (reassignment, adding, removing). We create a tuple using the command `()`. A tuple has the same operations as lists, such as indexing, slicing, len(), and more.
+
+
+
+
+<div class = "termy">
+
+```{python}
+# Problem 2
+def explore_seattle(seattle_map, curr_location):
+  # Create empty directory
+  distances = {}
+  for seattle_location in seattle_map:
+    name = seattle_location[0]
+    coords = seattle_location[1]
+    distances[name] = (((coords[0] - curr_location[0])) ** 2 + ((coords[1] - curr_location[1])) ** 2) ** 0.5
+    
+  return [i[0] for i in sorted(distances.items(), key=lambda x: (x[1], x[0]), reverse=False)]
+
+```
+
+
+
+```{python}
+explore_seattle([("Suzzallo Library", (1, 1)), ("Paul G. Allen School", (3, 5))], (7, 4))
+```
+
+</div>
+
+
+
+-----------------------------------
+
+
+
+### Part 3.
+
+
+At the core of your adoption business is an algorithm that uses prospective adopters’ preferences to find the best kitten to take home. There are four qualities of kittens that help to make a good match: `rowdiness`, `hungriness`, `cuddliness`, and `loudness`. You have created a database to track these qualities of all the kittens at your adoption center, which are placed on an integer point scale that goes from $0$ to $100$. 
+
+When someone comes to adopt a kitten, they fill out a form specifying their preferences for each of these qualities. Optionally, the adopter can specify one of the qualities as a **dealbreaker**: if the kitten’s score for that quality is more than 10 points away from the adopter’s preference, you do not recommend it to the adopter.
+
+
+For this question, you should write a function called `find_optimal_kitten` which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
+
+
+Additionally, your function should also take in a parameter called dealbreaker which can either be the name of a quality in the preference list (e.g. "rowdiness") or None. If a dealbreaker is input into the function, you should not consider any kittens which have a quality score that falls more than 10 points ($>10$) away from the adopter preference. If there are no kittens that are considered, return None.
+
+
+You can assume that no two kittens will have the exact same similarity score based on your kitten preferences.
+
+
+Hint: use the **means squared error algorithm**.
+
+
+
+
+
+Use the following sample kittens and kitten_preference dictionaries to test your answers:
+
+
+
+
+kittens = {
+
+    "blair": {"rowdiness": 100, "hungriness": 100, "cuddliness": 0, "loudness": 27},
+    
+    "danli": {"rowdiness": 22, "hungriness": 40, "cuddliness": 87, "loudness": 45},
+    
+    "jasper": {"rowdiness": 9, "hungriness": 70, "cuddliness": 66, "loudness": 7},
+    
+    "orlando": {"rowdiness": 4, "hungriness": 34, "cuddliness": 98, "loudness": 2},
+    
+    "gabrielle": {"rowdiness": 24, "hungriness": 30, "cuddliness": 76, "loudness": 100}
+
+}
+
+
+kitten_preference = {
+
+    "rowdiness": 70, "hungriness": 50, "cuddliness": 100, "loudness": 10
+
+}
+
+
+
+
+Here are a few examples that your function will be expected to produce:
+
+
+find_optimal_kitten(kittens, kitten_preference, None) should return "danli"
+"danli" is the kitten with the closest similarity (or smallest error) to your own kitten preferences.
+
+
+find_optimal_kitten(kittens, kitten_preference, "loudness") should return "orlando"
+The kittens "blair","danli", and "gabrielle" are not considered since their scores for loudness falls more than 10 points away from your preference in kitten_preference.
+"orlando" is the kitten with the closest similarity (or smallest error) to your own kitten preferences.
+
+
+find_optimal_kitten(kittens, kitten_preference, "rowdiness") should return None
+No kittens are considered since all of the kittens’ scores for rowdiness in kittens falls more than 10 points away from your preference in kitten_preference.
+
+
+
+
+
+
+\ 
+
+
+
+\ 
+
+
+
+
+We can calculate how similar scores are by using a metric called the **mean squared error** (MSE). Essentially, the MSE is a number that determines closeness of the two lines, where the larger the number is, the more different the two lines are. If the MSE is 0 then two lines are identical.
+
+The MSE is computed as follows. 
+
+- For each point in one dataset, compute the difference between it and the corresponding point in the other dataset and then square the difference.
+- Take the average of these squared differences.
+
+
+Write a function `mean_squared_error(numbers1, numbers2)` that takes two lists of numbers (you can assume the lists have the same length and are not empty) and returns the mean squared error between the lists.
+
+For this question, you should write a function called `find_optimal_kitten` which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
+
+
+
+
+
+
+------------------------------------
+
+
