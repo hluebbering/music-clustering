@@ -21,8 +21,6 @@ library(GGally)
 library(ggrepel)
 library(spotifyr)
 library(tidyverse)
-
-#source("data.R")
 ```
 
 
@@ -34,41 +32,8 @@ library(tidyverse)
 
 
 
-```{r}
-playlists_df <- read.csv('scripts/playlists.csv')
-head(playlists_df)
-```
 
 
-
-
-
-```{python}
-import csv
-
-df = open('scripts/playlists.csv')
-csv_reader = csv.DictReader(df)
-
-all_artists = []
-for row in csv_reader:
-  all_artists.append(row['artist_name'])
-
-
-new_dict = {}
-
-for i in all_artists:
-  if i in new_dict.keys():
-    new_dict[i] += 1
-  else:
-    new_dict[i] = 1
-  
-
-
-y = {k: v for k, v in sorted(new_dict.items(), key=lambda x: (x[1], x[0]), reverse=True)[1:20]}
-
-print(y)
-
-```
 
 
 
@@ -90,32 +55,6 @@ Write a function called `common_artists(artists)` that takes in a list of sets r
 
 
 Our assumptions include that the given list `artists` contains at least one set, although the length of the set may or may not be empty. In the case that artists contains at least one empty set, return 0.0.
-
-
-
-
-Here are a few examples that your function will be expected to produce:
-
-
-
-
-<div class="roundedlist">
-
-For example, suppose the given list of sets is 
-
-
-```bash
-[{"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus"}, {"Kanye West", "Justin Bieber"}]
-```
-
-- There is one artist (Kanye West) shared across all sets while there are four unique artists (Kanye West, Post Malone, Miley Cyrus, and Justin Bieber). Thus, our fraction of common artists percentage is $1/4 = 0.25$.
-
-
-</div>
-
-
-
-
 
 
 
@@ -160,11 +99,15 @@ def common_artists(artists):
 
 
 
+
+
+
 ```{python}
-common_artists([{"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus", "Post Malone"},  {"Kanye West", "Justin Bieber"}])
-common_artists([{"(G)I-DLE"}])
-common_artists([{"IU"}, {}])
+common_artists([
+  {"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus", "Post Malone"},
+  {"Kanye West", "Justin Bieber"}])
 ```
+
 
 
 
@@ -172,6 +115,7 @@ common_artists([{"IU"}, {}])
 
 
 
+There is one artist (Kanye West) shared across all sets while there are four unique artists (Kanye West, Post Malone, Miley Cyrus, and Justin Bieber). Thus, our fraction of common artists percentage is $1/4 = 0.25$.
 
 
 
@@ -327,24 +271,6 @@ kitten_preference = {
     "rowdiness": 70, "hungriness": 50, "cuddliness": 100, "loudness": 10
 
 }
-
-
-
-
-Here are a few examples that your function will be expected to produce:
-
-
-find_optimal_kitten(kittens, kitten_preference, None) should return "danli"
-"danli" is the kitten with the closest similarity (or smallest error) to your own kitten preferences.
-
-
-find_optimal_kitten(kittens, kitten_preference, "loudness") should return "orlando"
-The kittens "blair","danli", and "gabrielle" are not considered since their scores for loudness falls more than 10 points away from your preference in kitten_preference.
-"orlando" is the kitten with the closest similarity (or smallest error) to your own kitten preferences.
-
-
-find_optimal_kitten(kittens, kitten_preference, "rowdiness") should return None
-No kittens are considered since all of the kittens’ scores for rowdiness in kittens falls more than 10 points away from your preference in kitten_preference.
 
 
 

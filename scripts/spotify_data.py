@@ -1,4 +1,5 @@
 import csv
+from operator import index
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
@@ -17,8 +18,6 @@ track_ids = [x1["track"]["id"]
              for x1 in sp.playlist_tracks(playlist_URI)["items"]]
 artist_uris = [x2["track"]["artists"][0]["uri"]
                for x2 in sp.playlist_tracks(playlist_URI)["items"]]
-
-
 
 
 

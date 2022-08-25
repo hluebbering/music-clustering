@@ -329,6 +329,23 @@ a.navbar-brand {
 }
 
 
+.navbar.navbar-default.navbar-fixed-top::after {
+    content: "";
+    background-image: url("C:/Users/Hannah Luebbering/OneDrive/Documents/GitHub/playlist_report/assets/track_header2.png");
+    background-size: 105%;
+    background-position: 25% 71% !important;
+    opacity: 0.75;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    z-index: -1 !important;
+    filter: blur(0.125px);
+}
+
+
 
 span.fa.fa {
     height: 20pt;
@@ -613,9 +630,27 @@ code {
     font-family: 'Fira Sans Condensed';
     color: white;
     font-weight: 400;
-    background: radial-gradient(#000 16%, transparent 17%),radial-gradient(#444 16%, transparent 17%) 0px 1px, radial-gradient(#000 16%, transparent 17%) 8px 8px,radial-gradient(#444 16%, transparent 17%) 8px 9px;
-    background-color: #282828;
-    background-size: 16px 16px;
+    display: flex;
+    position: relative;
+    z-index: 2 !important;
+}
+
+
+.roundedlist::after {
+    background-image: url(https://i.pinimg.com/originals/17/a9/02/17a902407c603a93c20204993c74c9ca.jpg) !important;
+    content: "";
+    background-size: cover !important;
+    background-position: 0 0%!important;
+    opacity: 0.5;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    z-index: -1 !important;
+    filter: blur(0.125px);
+    border-radius: 10px;
 }
 
 .roundedlist li::marker {
@@ -705,16 +740,23 @@ code {
 }
 
 .roundedlist code {
-    box-shadow: -2px -2px 5px #212121, 2px 2px 5px #141414;
     padding: 3.5px 4px;
-    color: hsl(318deg 50% 50%);
     background: hsl(227deg 4% 15%);
     font-size: 9pt;
     text-shadow: 1px 1px 1px black;
-    box-shadow: 0px -3px 2px 0px #212428 inset, 0px 2px 2px #535d65 inset, 0px 2px 2px -1px #050606, 0px 7px 4px -1px #1a1d1f;
     background: linear-gradient(#3c4349, #252a2d);
     font-family: 'Inconsolata';
     font-weight: 400 !important;
+    letter-spacing: 0px !important;
+    padding: 0 !important;
+}
+
+
+.roundedlist pre.python::before {
+    top: -2.5pt;
+    padding: 0.75pt 2pt;
+    width: 32pt;
+    margin: -6pt -14pt;
 }
 
 
@@ -738,8 +780,13 @@ code {
 
 
 .roundedlist pre.python {
-  background: linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-    border: 2px outset rgba(255, 255, 255, 0.3);
+      background: linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+    border: 1.5pt outset rgba(255, 255, 255, 0.3);
+    width: 98%;
+    margin: 10pt auto !important;
+    padding: 12pt 18pt;
+    display: block;
+    backdrop-filter: blur(6px);
 }
 
 
@@ -752,7 +799,7 @@ code {
 }
 
 .termy pre.python code {
-  width: 100%;
+  /*width: 100%;*/
     flex-shrink: 0;
     color: #FFFFFF;
     padding: 60px 30px 30px 30px !important;
@@ -760,17 +807,18 @@ code {
     line-height: 18px;
     display: block;
     overflow-x: auto;
-    padding: 0 !important;
+    padding: 6pt !important;
     background: #282a36;
     margin: 0 !important;
 }
 
 .termy pre.python {
   width: 500px;
+  width: 98% !important;
     border-radius: 10px;
     position: relative;
     background: #282B36;
-    margin: 10px auto;
+    margin: 10pt auto;
     box-shadow: 0 10px 40px 0 rgb(40 43 54 / 30%);
     background: rgba(255,255,255,0.1);
     border-top: 1px solid rgba(255,255,255,0.5);
@@ -790,7 +838,8 @@ code {
     background: hsl(0deg 0% 96% / 50%);
     border: none !important;
     display: block;
-    width: 500px;
+    width: 90% !important;
+    /*width: 500px;*/
     margin: auto;
     margin-top: -10pt;
 }
