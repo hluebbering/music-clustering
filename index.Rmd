@@ -129,6 +129,22 @@ There is one artist (Kanye West) shared across all sets while there are four uni
 
 
 
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('scripts/playlists.csv', encoding_errors='ignore', index_col=0, header=0)
+
+feature_cols = ['acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_name', 'artist_name', 'popularity']
+
+dfSongs = df[feature_cols]
+
+# Number of rows and columns
+rows, cols = dfSongs.shape
+print(f'Number of songs: {rows}')
+print(f'Number of attributes per song: {cols}')
+```
 
 
 
@@ -156,7 +172,12 @@ Write a function called `explore_seattle(seattle_map, curr_location)`, where `se
 You will want to calculate the distance between you and all of the locations and return a list of all the location names. This list should be sorted first by distance between you and the location in ascending order, and any ties in distance are broken by alphabetical order of the location names.
 
 
+```{r}
+xx<-spotifyr::get_user_playlists(user_id = 'hannahluebbering')
+data.frame(xx) %>% dplyr::select('id', 'name') %>%
+  kable()
 
+```
 
 
 
