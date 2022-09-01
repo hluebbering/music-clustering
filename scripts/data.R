@@ -19,13 +19,21 @@ spotifyr::get_spotify_authorization_code()
 
 playlist1 <- spotifyr::get_playlist(playlist_id = "4lSykOrQfnAiCgtHKVudTT")
 playlist2 <- spotifyr::get_playlist(playlist_id = "1nvpVNmzL7Vi1pXcQEiaLx")
+
+
 playlist3 <- spotifyr::get_playlist(playlist_id = "7JJd5q4ZPK0P1Q4atTcpkR")
+playlist4 <- spotifyr::get_playlist(playlist_id = "3NqHrY8dm9DBq29GowDFtw")
+playlist5 <- spotifyr::get_playlist(playlist_id = "4qfffs5EG6ikw9YkhCGGDl")
 
 
 # Get Playlist Tracks
 
 playlist1_tracks <- playlist1$tracks$items
 playlist2_tracks <- playlist2$tracks$items
+
+playlist3_tracks <- playlist3$tracks$items
+playlist4_tracks <- playlist4$tracks$items
+playlist5_tracks <- playlist5$tracks$items
 
 
 # Label and Merge Playlists
@@ -40,8 +48,23 @@ playlist2_tracks$playlist_name <- rep(
 )
 
 
+playlist3_tracks$playlist_name <- rep(
+  playlist3$name[1], length(playlist3_tracks$added_at)
+)
+playlist4_tracks$playlist_name <- rep(
+  playlist4$name[1], length(playlist4_tracks$added_at)
+)
+playlist5_tracks$playlist_name <- rep(
+  playlist5$name[1], length(playlist5_tracks$added_at)
+)
 
-playlists_merged <- dplyr::bind_rows(playlist1_tracks, playlist2_tracks)
+
+
+playlists_merged <- dplyr::bind_rows(playlist1_tracks, 
+                                     playlist2_tracks,
+                                     playlist3_tracks,
+                                     playlist4_tracks,
+                                     playlist5_tracks)
 
 
 
@@ -52,12 +75,22 @@ for (i in n) {
   if (i > 100) {
     playlist_idsA <- playlists_merged$track.id[1:100]
     playlist_idsB <- playlists_merged$track.id[101:200]
-    playlist_idsC <- playlists_merged$track.id[201:i]
+    playlist_idsC <- playlists_merged$track.id[201:300]
+    playlist_idsD <- playlists_merged$track.id[301:400]
+    playlist_idsE <- playlists_merged$track.id[401:500]
+    playlist_idsF <- playlists_merged$track.id[501:600]
+    playlist_idsG <- playlists_merged$track.id[601:700]
+    playlist_idsH <- playlists_merged$track.id[701:i]
     x <- rbind(
       get_track_audio_features(playlist_idsA),
       get_track_audio_features(playlist_idsB),
-      get_track_audio_features(playlist_idsC)
-    )
+      get_track_audio_features(playlist_idsC),
+      get_track_audio_features(playlist_idsD),
+      get_track_audio_features(playlist_idsE),
+      get_track_audio_features(playlist_idsF),
+      get_track_audio_features(playlist_idsG),
+      get_track_audio_features(playlist_idsH)
+  )
 
     playlists_merged2 <- cbind(playlists_merged, x)
   }
@@ -109,4 +142,5 @@ colnames(df) <- c(
 
 # Save as csv file
 
-write.csv(df, file = "scripts/playlists.csv", row.names = TRUE)
+write.csv(df, file = "scripts/playlists.csv", row.names = TRUE,
+          append = FALSE)
