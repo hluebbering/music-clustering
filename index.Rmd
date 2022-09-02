@@ -21,6 +21,9 @@ library(GGally)
 library(ggrepel)
 library(spotifyr)
 library(tidyverse)
+library(shiny)
+library(shinydashboard)
+
 ```
 
 
@@ -33,7 +36,154 @@ library(tidyverse)
 
 
 
+- Generate a playlist from a song
+- Generate a playlist from a playlist
+- Edit a playlist
 
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------
+
+
+
+
+
+
+
+
+```{r}
+demo_textarea <- 
+  textAreaInput("demo_textarea", 
+                label = "Biography", 
+                value = "",
+                width = "100%",
+                rows = 5, 
+                placeholder = "Tell us something interesting about you.")
+
+
+checkboxGroupInput(
+  inputId = "fav_things",
+  label = "What are your favourite things?",
+  choices = c("Coding", "Cycling", "Cooking"))
+
+actionButton(
+  inputId = "count_fav_things",
+  label = "Count",
+  icon = icon("calculator"))
+
+# update count_text on fav_things
+count_text <- reactive({
+  count_fav_things
+  fav_things <- isolate(fav_things)
+  n <- length(fav_things)
+  sprintf("You have %d favourite things", n)
+  })
+  
+# display count_text when it updates
+n_fav_things <- renderText(count_text())
+
+
+textOutput(outputId = "n_fav_things")
+
+```
+
+
+```{r}
+tabItem(tabName = "demo_tab",
+        box(
+          textInput("given", "Given Name"),
+          textInput("surname", "Surname"),
+          selectInput("pet", "What is your favourite pet?",
+                      c("cats", "dogs", "ferrets"))
+        ),
+        box(
+          textAreaInput("bio", NULL,
+                        height = "100px",
+                        placeholder = "brief bio")
+        ))
+
+
+
+```
+
+
+
+
+
+
+```{r}
+demo_text <- 
+  textInput("demo_text", 
+            label = "Name", 
+            value = "", 
+            width = "100%",
+            placeholder = "Your Name")
+
+
+# in the UI function
+textOutput("demo_text", container = tags$h3)
+```
+
+
+
+
+<p>What would you set <code><span class="at">accept</span></code> to to accept any image file?<br><select class="webex-select"><option value="blank"></option>
+<option value="answer">image/*</option>
+<option value="">.jpg</option>
+<option value="">jpg</option>
+<option value="">images</option>
+<option value="">.img</option></select></p>
+
+
+
+
+------------------------------------------------
+
+
+
+
+
+
+```{r}
+data <- data.frame(
+  name = character(0),
+  birthyear = integer(0),
+  R_user = logical(0),
+  score = double(0)
+)
+
+
+data2 <- data.frame(
+  name = c("Lisa", "Hannah"),
+  birthyear = c(1976L, 1999L),
+  R_user = c(TRUE, TRUE),
+  score = c(10.2, 7.4)
+)
+
+data <- rbind(data, data2)
+
+string_data <- lapply(data, sapply, toString) %>% 
+  as.data.frame(row.names = NULL)
+
+string_data
+#readr::write_csv(string_data, "data.csv")
+```
+
+
+
+
+
+
+
+------------------------------------------------
 
 
 
@@ -44,6 +194,10 @@ library(tidyverse)
 
 
 <span class = "myhighlight">Overview:</span> Given a list of playlists, find all duplicated songs.
+
+
+
+
 
 
 
@@ -129,22 +283,6 @@ There is one artist (Kanye West) shared across all sets while there are four uni
 
 
 
-```{python}
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
-df = pd.read_csv('scripts/playlists.csv', encoding_errors='ignore', index_col=0, header=0)
-
-feature_cols = ['acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_name', 'artist_name', 'popularity']
-
-dfSongs = df[feature_cols]
-
-# Number of rows and columns
-rows, cols = dfSongs.shape
-print(f'Number of songs: {rows}')
-print(f'Number of attributes per song: {cols}')
-```
 
 
 
@@ -172,12 +310,6 @@ Write a function called `explore_seattle(seattle_map, curr_location)`, where `se
 You will want to calculate the distance between you and all of the locations and return a list of all the location names. This list should be sorted first by distance between you and the location in ascending order, and any ties in distance are broken by alphabetical order of the location names.
 
 
-```{r}
-xx<-spotifyr::get_user_playlists(user_id = 'hannahluebbering')
-data.frame(xx) %>% dplyr::select('id', 'name') %>%
-  kable()
-
-```
 
 
 
@@ -193,50 +325,14 @@ D (a,b) &=
 $$
 
 
-Here are a few examples that your function will be expected to produce:
 
 
-<div class = "roundedlist">
-
-```python
-explore_seattle([("Suzzallo Library", (1, 1)), ("Paul G. Allen School", (3, 5))], (7, 4)) should return ["Paul G. Allen School", "Suzzallo Library"]
-```
-</div>
-
-
-explore_seattle([("Snowy Village", (10, 0)), ("Tea Republik", (0, 0))], (3, 4)) should return ["Tea Republik", "Snowy Village"]
-explore_seattle([("Henry Art Gallery", (1, 0)), ("Museum of Museums", (0, 1), ("Seattle Art Museum", (-1, 0))], (0, 0)) should return ["Henry Art Gallery", "Museum of Museums", "Seattle Art Museum"]
 
 
 
 By definition, tuples are immutable, which means that we cannot change elements (reassignment, adding, removing). We create a tuple using the command `()`. A tuple has the same operations as lists, such as indexing, slicing, len(), and more.
 
 
-
-
-<div class = "termy">
-
-```{python}
-# Problem 2
-def explore_seattle(seattle_map, curr_location):
-  # Create empty directory
-  distances = {}
-  for seattle_location in seattle_map:
-    name = seattle_location[0]
-    coords = seattle_location[1]
-    distances[name] = (((coords[0] - curr_location[0])) ** 2 + ((coords[1] - curr_location[1])) ** 2) ** 0.5
-    
-  return [i[0] for i in sorted(distances.items(), key=lambda x: (x[1], x[0]), reverse=False)]
-
-```
-
-
-
-```{python}
-explore_seattle([("Suzzallo Library", (1, 1)), ("Paul G. Allen School", (3, 5))], (7, 4))
-```
-
-</div>
 
 
 
@@ -247,51 +343,25 @@ explore_seattle([("Suzzallo Library", (1, 1)), ("Paul G. Allen School", (3, 5))]
 ### Part 3.
 
 
-At the core of your adoption business is an algorithm that uses prospective adopters’ preferences to find the best kitten to take home. There are four qualities of kittens that help to make a good match: `rowdiness`, `hungriness`, `cuddliness`, and `loudness`. You have created a database to track these qualities of all the kittens at your adoption center, which are placed on an integer point scale that goes from $0$ to $100$. 
+At the core of your adoption business is an algorithm that uses prospective adopters’ preferences to find the best kitten to take home. There are four qualities of kittens that help to make a good match: `rowdiness`, `hungriness`, `cuddliness`, and `loudness`. You have created a database to track these qualities, which are placed on an integer point scale. 
 
-When someone comes to adopt a kitten, they fill out a form specifying their preferences for each of these qualities. Optionally, the adopter can specify one of the qualities as a **dealbreaker**: if the kitten’s score for that quality is more than 10 points away from the adopter’s preference, you do not recommend it to the adopter.
+Optionally, the adopter can specify one of the qualities as a **dealbreaker**: if the kitten’s score for that quality is more than 10 points away from the adopter’s preference, you do not recommend it to the adopter.
 
-
-For this question, you should write a function called `find_optimal_kitten` which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
+Write a function which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
 
 
 Additionally, your function should also take in a parameter called dealbreaker which can either be the name of a quality in the preference list (e.g. "rowdiness") or None. If a dealbreaker is input into the function, you should not consider any kittens which have a quality score that falls more than 10 points ($>10$) away from the adopter preference. If there are no kittens that are considered, return None.
 
 
-You can assume that no two kittens will have the exact same similarity score based on your kitten preferences.
 
 
-Hint: use the **means squared error algorithm**.
-
-
-
-
-
-Use the following sample kittens and kitten_preference dictionaries to test your answers:
+Hint: use the **means squared error algorithm**. Use the following sample kittens and kitten_preference dictionaries to test your answers:
 
 
 
 
-kittens = {
-
-    "blair": {"rowdiness": 100, "hungriness": 100, "cuddliness": 0, "loudness": 27},
-    
-    "danli": {"rowdiness": 22, "hungriness": 40, "cuddliness": 87, "loudness": 45},
-    
-    "jasper": {"rowdiness": 9, "hungriness": 70, "cuddliness": 66, "loudness": 7},
-    
-    "orlando": {"rowdiness": 4, "hungriness": 34, "cuddliness": 98, "loudness": 2},
-    
-    "gabrielle": {"rowdiness": 24, "hungriness": 30, "cuddliness": 76, "loudness": 100}
-
-}
-
-
-kitten_preference = {
-
-    "rowdiness": 70, "hungriness": 50, "cuddliness": 100, "loudness": 10
-
-}
+- kittens = {"blair": {"rowdiness": 100, "hungriness": 100, "cuddliness": 0, "loudness": 27}}
+- kitten_preference = {"rowdiness": 70, "hungriness": 50, "cuddliness": 100, "loudness": 10}
 
 
 
@@ -300,9 +370,6 @@ kitten_preference = {
 
 \ 
 
-
-
-\ 
 
 
 
@@ -317,7 +384,6 @@ The MSE is computed as follows.
 
 Write a function `mean_squared_error(numbers1, numbers2)` that takes two lists of numbers (you can assume the lists have the same length and are not empty) and returns the mean squared error between the lists.
 
-For this question, you should write a function called `find_optimal_kitten` which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
 
 
 

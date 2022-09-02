@@ -12,11 +12,9 @@ df2 = df.copy(deep=True)
 df2 = df2.drop(df2[df2.playlist_name != 'but my feet in bottega'].index)
 
 # Get songs from a playlist
-df2 = df.copy(deep=True)
-df2 = df2.drop(df2[df2.playlist_name != 'pardon me while I elevate'].index)
+# df2 = df.copy(deep=True)
+# df2 = df2.drop(df2[df2.playlist_name != 'pardon me while I elevate'].index)
 
-
-#df = df.drop(df[df.score < 50].index)
 
 
 feature_cols = ['acousticness', 'danceability', 'duration_ms', 'energy',
