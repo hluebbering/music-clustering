@@ -60,8 +60,7 @@ library(shinydashboard)
 
 
 ```{r}
-demo_textarea <- 
-  textAreaInput("demo_textarea", 
+textAreaInput("demo_textarea", 
                 label = "Biography", 
                 value = "",
                 width = "100%",
@@ -69,30 +68,20 @@ demo_textarea <-
                 placeholder = "Tell us something interesting about you.")
 
 
-checkboxGroupInput(
-  inputId = "fav_things",
-  label = "What are your favourite things?",
-  choices = c("Coding", "Cycling", "Cooking"))
-
-actionButton(
-  inputId = "count_fav_things",
-  label = "Count",
-  icon = icon("calculator"))
-
-# update count_text on fav_things
-count_text <- reactive({
-  count_fav_things
-  fav_things <- isolate(fav_things)
-  n <- length(fav_things)
-  sprintf("You have %d favourite things", n)
-  })
-  
-# display count_text when it updates
-n_fav_things <- renderText(count_text())
-
-
-textOutput(outputId = "n_fav_things")
-
+fluidPage(sidebarLayout(
+  sidebarPanel(
+    checkboxGroupInput(
+      inputId = "fav_things",
+      label = "What are your favourite things?",
+      choices = c("Coding", "Cycling", "Cooking")),
+    actionButton(
+      inputId = "count_fav_things",
+      label = "Count",
+      icon = icon("calculator"))
+                  ),
+  mainPanel(textOutput(
+    outputId = "n_fav_things"))
+  ))
 ```
 
 
@@ -152,7 +141,7 @@ textOutput("demo_text", container = tags$h3)
 
 
 
-```{r}
+```{r, echo=FALSE}
 data <- data.frame(
   name = character(0),
   birthyear = integer(0),
@@ -173,7 +162,9 @@ data <- rbind(data, data2)
 string_data <- lapply(data, sapply, toString) %>% 
   as.data.frame(row.names = NULL)
 
-string_data
+string_data %>% kable()
+
+
 #readr::write_csv(string_data, "data.csv")
 ```
 
