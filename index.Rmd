@@ -23,7 +23,9 @@ library(spotifyr)
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
+library(magick)
 
+source('scripts/data.R')
 ```
 
 
@@ -41,16 +43,46 @@ library(shinydashboard)
 - Edit a playlist
 
 
+```{r}
+mydf2 <- spotifyr::get_my_playlists(limit = 50) %>%
+  dplyr::filter(public == TRUE) %>%
+  dplyr::select(id, images, name, snapshot_id) %>% 
+  dplyr::filter(id != '33SzrwTchxvwouepwsj8KV') %>%
+  dplyr::filter(id != '09GJ0uEndlrfFWZXX423Jm') %>%
+  dplyr::filter(id != '73zGnfOwzNdzMqymtECwkp') %>%
+  dplyr::filter(id != '0cUfOXZrFRuz5xn5J9KwGj') %>%
+  dplyr::filter(id != '1nvpVNmzL7Vi1pXcQEiaLx')
+
+ximg <- mydf2$images 
+get_images <- list()
+
+for (i in 1:16) {
+  myimage <- ximg[i] %>% data.frame() %>% 
+    dplyr::filter(height == 640) %>% dplyr::select(url) %>% 
+    unlist(use.names = FALSE)
+  tiger <- image_read(path = myimage, depth = 16, density = 2000)
+  get_images <- append(get_images, tiger)
+}
+
+get_images <- image_scale(get_images, "1000x1000")
+
+get_images1 <- image_append(image_scale(get_images[1:4], "x900"))
+get_images2 <- image_append(image_scale(get_images[5:8], "x900"))
+get_images3 <- image_append(image_scale(get_images[9:12], "x900")) 
+get_images4 <- image_append(image_scale(get_images[13:16], "x900")) 
+all_images <- c(get_images1, get_images2, get_images3, get_images4)
+
+image_append(image_scale(all_images, "x900"), stack = TRUE)
+
+```
 
 
+```{r}
+x <- image_append(image_scale(all_images, "x280"), stack = TRUE)
 
+image_write(x, path = "my_playlists.png", format = "png",quality = 100,depth = 16,density = 1000)
+```
 
-
-
-
-
-
-------------------------------------------------
 
 
 
@@ -60,114 +92,92 @@ library(shinydashboard)
 
 
 ```{r}
-textAreaInput("demo_textarea", 
-                label = "Biography", 
-                value = "",
-                width = "100%",
-                rows = 5, 
-                placeholder = "Tell us something interesting about you.")
+mydf <- spotifyr::get_my_playlists(limit = 50) %>%
+  dplyr::filter(public == TRUE) %>%
+  dplyr::select(id, images, name, snapshot_id) %>% 
+  dplyr::filter(id != '33SzrwTchxvwouepwsj8KV')
 
 
-fluidPage(sidebarLayout(
-  sidebarPanel(
-    checkboxGroupInput(
-      inputId = "fav_things",
-      label = "What are your favourite things?",
-      choices = c("Coding", "Cycling", "Cooking")),
-    actionButton(
-      inputId = "count_fav_things",
-      label = "Count",
-      icon = icon("calculator"))
-                  ),
-  mainPanel(textOutput(
-    outputId = "n_fav_things"))
-  ))
+mydf %>%
+  dplyr::select(id, name) %>% 
+  kable(row.names = 1:nrow(mydf)) %>%
+  kable_styling(font_size = 12, bootstrap_options = c("striped", "condensed"))
 ```
+
+```{r}
+ximg <- mydf$images 
+playlist_images <- list()
+
+for (i in 1:20) {
+  myimage <- ximg[i] %>% data.frame() %>% 
+    dplyr::filter(height == 640) %>% dplyr::select(url) %>% 
+    unlist(use.names = FALSE)
+  tiger <- image_read(path = myimage, depth = 16, density = 1800)
+  playlist_images <- append(playlist_images, tiger)
+}
+
+playlist_images <- image_scale(playlist_images, "800x800")
+
+playlist_images1A <- image_append(image_scale(playlist_images[1:10], "x900"))
+playlist_images1B <- image_append(image_scale(playlist_images[11:20], "x900"))
+all_playlist_images <- c(playlist_images1A, playlist_images1B)
+
+
+
+x2 <- image_append(image_scale(all_playlist_images, "x250"), stack = TRUE)
+image_write(x2, path = "my_playlists2.png", format = "png",quality = 100,depth = 16,density = 1000)
+```
+
+
+
+rsconnect::setAccountInfo(name='hannahluebbering',
+			  token='4F76484E220B724471AD0F7F930EE60F',
+			  secret='y62n0cQV9aM3iHebdXKFxsJ4OBnLYaBKc12kVK/b')
+
+
+
+
+
+
+
+
+
+
+```{r echo=FALSE}
+df2 <- dplyr::filter(df, playlist_name == 'but my feet in bottega') 
+
+df3 <- df2 %>% dplyr::select(track_name, artist_name, album_name,popularity, release_date) %>% dplyr::arrange(desc(popularity))
+
+kable(df3 %>% head(12)) %>% kable_styling(bootstrap_options = c('striped'))
+
+```
+
 
 
 ```{r}
-tabItem(tabName = "demo_tab",
-        box(
-          textInput("given", "Given Name"),
-          textInput("surname", "Surname"),
-          selectInput("pet", "What is your favourite pet?",
-                      c("cats", "dogs", "ferrets"))
-        ),
-        box(
-          textAreaInput("bio", NULL,
-                        height = "100px",
-                        placeholder = "brief bio")
-        ))
+juice_wrld <- spotifyr::get_artist_audio_features(artist = 'Juice Wrld')
+juice_wrld <- juice_wrld %>% dplyr::select('track_name','artist_name','artist_id','artists','album_release_date','album_name','danceability','energy','key','loudness','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','key_name')
 
-
-
+juice_wrld_id <- unique(juice_wrld$artist_id)
+juice_wrld_top_tracks <- spotifyr::get_artist_top_tracks(juice_wrld_id)
+juice_wrld_top_tracks <- juice_wrld_top_tracks %>%
+  dplyr::select('artists', 'name','popularity','album.name')
 ```
-
 
 
 
 
 
 ```{r}
-demo_text <- 
-  textInput("demo_text", 
-            label = "Name", 
-            value = "", 
-            width = "100%",
-            placeholder = "Your Name")
+plotA <- ggplot(data = juice_wrld) +
+  geom_bar(mapping = aes(x=album_name, y = energy),stat = 'identity') +
+  geom_point(data=juice_wrld_top_tracks, mapping = aes(x=album.name,color=name, y =as.numeric(sqrt(popularity+popularity^1000)^0.5), cex=popularity))  +
+  coord_flip() +
+  hrbrthemes::theme_ipsum_rc() +
+  theme(legend.position = "none")
 
-
-# in the UI function
-textOutput("demo_text", container = tags$h3)
+plotA
 ```
-
-
-
-
-<p>What would you set <code><span class="at">accept</span></code> to to accept any image file?<br><select class="webex-select"><option value="blank"></option>
-<option value="answer">image/*</option>
-<option value="">.jpg</option>
-<option value="">jpg</option>
-<option value="">images</option>
-<option value="">.img</option></select></p>
-
-
-
-
-------------------------------------------------
-
-
-
-
-
-
-```{r, echo=FALSE}
-data <- data.frame(
-  name = character(0),
-  birthyear = integer(0),
-  R_user = logical(0),
-  score = double(0)
-)
-
-
-data2 <- data.frame(
-  name = c("Lisa", "Hannah"),
-  birthyear = c(1976L, 1999L),
-  R_user = c(TRUE, TRUE),
-  score = c(10.2, 7.4)
-)
-
-data <- rbind(data, data2)
-
-string_data <- lapply(data, sapply, toString) %>% 
-  as.data.frame(row.names = NULL)
-
-string_data %>% kable()
-
-
-#readr::write_csv(string_data, "data.csv")
-```
-
 
 
 

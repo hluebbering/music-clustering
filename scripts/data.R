@@ -79,8 +79,8 @@ for (i in n) {
     playlist_idsD <- playlists_merged$track.id[301:400]
     playlist_idsE <- playlists_merged$track.id[401:500]
     playlist_idsF <- playlists_merged$track.id[501:600]
-    playlist_idsG <- playlists_merged$track.id[601:700]
-    playlist_idsH <- playlists_merged$track.id[701:i]
+    playlist_idsG <- playlists_merged$track.id[601:i]
+    #playlist_idsH <- playlists_merged$track.id[701:i]
     x <- rbind(
       get_track_audio_features(playlist_idsA),
       get_track_audio_features(playlist_idsB),
@@ -88,8 +88,8 @@ for (i in n) {
       get_track_audio_features(playlist_idsD),
       get_track_audio_features(playlist_idsE),
       get_track_audio_features(playlist_idsF),
-      get_track_audio_features(playlist_idsG),
-      get_track_audio_features(playlist_idsH)
+      get_track_audio_features(playlist_idsG)
+      #get_track_audio_features(playlist_idsH)
   )
 
     playlists_merged2 <- cbind(playlists_merged, x)

@@ -1,0 +1,14 @@
+name: spotify3
+title: spotify3
+username:
+account: hannahluebbering
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7196383
+bundleId: 6365192
+url: https://hannahluebbering.shinyapps.io/spotify3/
+when: 1664828326.19086
+lastSyncTime: 1664828326.19086
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: dd.Rmd|K.R|www/authorize.R|www/authorize2.R

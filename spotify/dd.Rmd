@@ -1,0 +1,141 @@
+---
+output: 
+  html_document: 
+    highlight: tango
+    theme: paper
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, out.width = "80%")
+library(spotifyr)
+library(magick)
+```
+
+```{r}
+playlist <- get_playlist('4CFQS4qqrAfKcqxzebBYbk')
+
+playlist_tracks <- get_playlist_audio_features(playlist_uris = playlist$id) %>%
+  data.frame() %>% dplyr::mutate(
+    artist_name = map_chr(track.artists, function(x) x$name[1]),
+    artist_id = map_chr(track.artists, function(x) x$id[1]),
+    release_date = lubridate::as_date(track.album.release_date)) %>%
+  dplyr::select(track.id, track.name, artist_id, artist_name, 
+                track.album.name, release_date,
+                track.explicit, track.popularity, track.duration_ms,
+                danceability, energy, loudness, speechiness, acousticness, 
+                instrumentalness, liveness, valence, tempo, key_mode)
+
+
+
+```
+
+
+
+
+```{r}
+artist_count <- playlist_tracks %>% 
+  dplyr::count(artist_name) %>% 
+  dplyr::arrange(desc(n))
+
+artist_plot <- ggplot(data = head(artist_count, 20),
+                      mapping = aes(x = reorder(artist_name, n), y = n,
+                                    fill = n)) + 
+  geom_bar(stat = "identity") +
+    coord_flip() + theme_modern_rc(base_size = 10, plot_title_size = 11)
+
+ggplotly(artist_plot)
+```
+
+
+
+```{r}
+top_artists <- playlist_tracks %>% 
+  dplyr::count(artist_id) %>% 
+  dplyr::arrange(desc(n)) %>% 
+  head(5) %>% dplyr::select(artist_id)
+
+top_artists_list <- unlist(top_artists)
+model <- get_artists(top_artists_list[1:5])
+
+x1 <- model$images[1] %>% data.frame()
+x2 <- model$images[2] %>% data.frame()
+x3 <- model$images[3] %>% data.frame()
+
+
+img1 <- image_read(path = x1$url[1])
+img2 <- image_read(path = x2$url[1])
+img3 <- image_read(path = x3$url[1])
+
+artist_img <- image_append(c(img1, img2, img3))
+
+print(artist_img)
+```
+
+```{r}
+artist_ids <- playlist_tracks %>% 
+  dplyr::select(artist_id) %>% 
+  dplyr::distinct()
+
+nartists <- nrow(artist_ids)
+artist_id_list <- unlist(artist_ids)
+
+total_artist_list = data.frame()
+for (i in 1:nartists){
+    model <- get_artists(artist_id_list[i])
+    # add vector to a dataframe
+    df <- data.frame(model)
+    total_artist_list <- rbind(total_artist_list, df)
+}
+
+
+
+```
+
+
+
+```{r}
+
+genre_list <- unlist(total_artist_list$genres)
+
+genre_count <- data.frame("genre" = genre_list) %>%
+  dplyr::count(genre) %>% 
+  dplyr::group_by(genre) %>%
+  dplyr::arrange(desc(n)) 
+
+ggplot(head(genre_count, 24), 
+       mapping = aes(x = reorder(genre, n), y = n, fill = n)) + 
+  geom_bar(stat = "identity") + 
+  labs(title = "Genres in playlist", x = "Frequency", y = "Genre") +
+  coord_flip() + theme_modern_rc(base_size = 10, plot_title_size = 11)  
+
+```
+
+
+
+
+
+
+
+```{r}
+pp <- playlist_tracks %>% data.frame() %>%
+  tidyr::pivot_longer(cols = c(danceability, energy, loudness, 
+                                   speechiness, acousticness, instrumentalness, 
+                                   liveness, valence, tempo, track.popularity),
+                          names_to = "feature",
+                          values_to = "value") %>%
+  dplyr::select(track.name, artist_name, feature, value, release_date) %>%
+  dplyr::arrange() 
+
+p <- ggplot(pp, mapping = aes(x=value)) +
+    geom_histogram(stat = 'bin',position = 'stack',bins = 8,
+                   mapping = aes(fill = feature),color='black') + 
+    facet_wrap(vars(feature), scales = 'free',nrow = 3)  + 
+  theme_ipsum_rc(base_size = 8,strip_text_size = 11, strip_text_face = "bold",panel_spacing = unit(units = 'pt', 80),plot_margin = margin(0,0,0,0)) + xlab(NULL) + ylab(NULL) +
+  theme(legend.position = "none") + scale_fill_manual(values = c('red','blue','magenta','plum','purple','pink','hotpink','green','navy','aquamarine'))
+ggplotly(p)
+```
+
+
+
+
