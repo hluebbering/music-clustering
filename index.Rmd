@@ -24,6 +24,10 @@ library(tidyverse)
 library(shiny)
 library(shinydashboard)
 library(magick)
+library(genius)
+library(tidytext)
+library(geniusr)
+library(dplyr)
 
 source('scripts/data.R')
 ```
@@ -41,116 +45,13 @@ source('scripts/data.R')
 - Generate a playlist from a song
 - Generate a playlist from a playlist
 - Edit a playlist
-
-
-```{r}
-mydf2 <- spotifyr::get_my_playlists(limit = 50) %>%
-  dplyr::filter(public == TRUE) %>%
-  dplyr::select(id, images, name, snapshot_id) %>% 
-  dplyr::filter(id != '33SzrwTchxvwouepwsj8KV') %>%
-  dplyr::filter(id != '09GJ0uEndlrfFWZXX423Jm') %>%
-  dplyr::filter(id != '73zGnfOwzNdzMqymtECwkp') %>%
-  dplyr::filter(id != '0cUfOXZrFRuz5xn5J9KwGj') %>%
-  dplyr::filter(id != '1nvpVNmzL7Vi1pXcQEiaLx')
-
-ximg <- mydf2$images 
-get_images <- list()
-
-for (i in 1:16) {
-  myimage <- ximg[i] %>% data.frame() %>% 
-    dplyr::filter(height == 640) %>% dplyr::select(url) %>% 
-    unlist(use.names = FALSE)
-  tiger <- image_read(path = myimage, depth = 16, density = 2000)
-  get_images <- append(get_images, tiger)
-}
-
-get_images <- image_scale(get_images, "1000x1000")
-
-get_images1 <- image_append(image_scale(get_images[1:4], "x900"))
-get_images2 <- image_append(image_scale(get_images[5:8], "x900"))
-get_images3 <- image_append(image_scale(get_images[9:12], "x900")) 
-get_images4 <- image_append(image_scale(get_images[13:16], "x900")) 
-all_images <- c(get_images1, get_images2, get_images3, get_images4)
-
-image_append(image_scale(all_images, "x900"), stack = TRUE)
-
-```
-
-
-```{r}
-x <- image_append(image_scale(all_images, "x280"), stack = TRUE)
-
-image_write(x, path = "my_playlists.png", format = "png",quality = 100,depth = 16,density = 1000)
-```
+- Get lyrics: determine most used drug names from lyrics
+  - predict mainstream drug usage
 
 
 
 
 
-
-
-
-
-```{r}
-mydf <- spotifyr::get_my_playlists(limit = 50) %>%
-  dplyr::filter(public == TRUE) %>%
-  dplyr::select(id, images, name, snapshot_id) %>% 
-  dplyr::filter(id != '33SzrwTchxvwouepwsj8KV')
-
-
-mydf %>%
-  dplyr::select(id, name) %>% 
-  kable(row.names = 1:nrow(mydf)) %>%
-  kable_styling(font_size = 12, bootstrap_options = c("striped", "condensed"))
-```
-
-```{r}
-ximg <- mydf$images 
-playlist_images <- list()
-
-for (i in 1:20) {
-  myimage <- ximg[i] %>% data.frame() %>% 
-    dplyr::filter(height == 640) %>% dplyr::select(url) %>% 
-    unlist(use.names = FALSE)
-  tiger <- image_read(path = myimage, depth = 16, density = 1800)
-  playlist_images <- append(playlist_images, tiger)
-}
-
-playlist_images <- image_scale(playlist_images, "800x800")
-
-playlist_images1A <- image_append(image_scale(playlist_images[1:10], "x900"))
-playlist_images1B <- image_append(image_scale(playlist_images[11:20], "x900"))
-all_playlist_images <- c(playlist_images1A, playlist_images1B)
-
-
-
-x2 <- image_append(image_scale(all_playlist_images, "x250"), stack = TRUE)
-image_write(x2, path = "my_playlists2.png", format = "png",quality = 100,depth = 16,density = 1000)
-```
-
-
-
-rsconnect::setAccountInfo(name='hannahluebbering',
-			  token='4F76484E220B724471AD0F7F930EE60F',
-			  secret='y62n0cQV9aM3iHebdXKFxsJ4OBnLYaBKc12kVK/b')
-
-
-
-
-
-
-
-
-
-
-```{r echo=FALSE}
-df2 <- dplyr::filter(df, playlist_name == 'but my feet in bottega') 
-
-df3 <- df2 %>% dplyr::select(track_name, artist_name, album_name,popularity, release_date) %>% dplyr::arrange(desc(popularity))
-
-kable(df3 %>% head(12)) %>% kable_styling(bootstrap_options = c('striped'))
-
-```
 
 
 
@@ -162,16 +63,44 @@ juice_wrld_id <- unique(juice_wrld$artist_id)
 juice_wrld_top_tracks <- spotifyr::get_artist_top_tracks(juice_wrld_id)
 juice_wrld_top_tracks <- juice_wrld_top_tracks %>%
   dplyr::select('artists', 'name','popularity','album.name')
+
+juice_wrld
+
 ```
 
 
 
 
+```{r, message=FALSE, warning=FALSE}
+x1 <- juice_wrld$track_name[4]
+x2 <- juice_wrld$artist_name[3]
+x3 <- juice_wrld$album_name[3]
+
+ 
+
+#get_lyrics <- get_discography(x2) %>%dplyr::filter(track_name == x1)
+ 
+
+
+get_lyrics_search(artist_name = x2, song_title = x1) %>% 
+  unnest_tokens(bigram, line, token = "ngrams", n = 2) # get lyric bigrams
+```
+
+```{r}
+get_lyrics_search(artist_name = "Kanye West",
+                  song_title = "Good Morning") %>%
+  unnest_tokens(bigram, line, token = "ngrams", n = 2) %>%
+  filter(bigram == "good morning") %>% 
+  nrow() # count bigram frequency
+
+
+```
+
+
 
 ```{r}
 plotA <- ggplot(data = juice_wrld) +
-  geom_bar(mapping = aes(x=album_name, y = energy),stat = 'identity') +
-  geom_point(data=juice_wrld_top_tracks, mapping = aes(x=album.name,color=name, y =as.numeric(sqrt(popularity+popularity^1000)^0.5), cex=popularity))  +
+  geom_bar(mapping = aes(x=album_name, y = energy),stat = 'identity')  +
   coord_flip() +
   hrbrthemes::theme_ipsum_rc() +
   theme(legend.position = "none")
@@ -331,7 +260,6 @@ $$
 
 
 
-By definition, tuples are immutable, which means that we cannot change elements (reassignment, adding, removing). We create a tuple using the command `()`. A tuple has the same operations as lists, such as indexing, slicing, len(), and more.
 
 
 
@@ -341,49 +269,7 @@ By definition, tuples are immutable, which means that we cannot change elements 
 
 
 
-### Part 3.
 
-
-At the core of your adoption business is an algorithm that uses prospective adopters’ preferences to find the best kitten to take home. There are four qualities of kittens that help to make a good match: `rowdiness`, `hungriness`, `cuddliness`, and `loudness`. You have created a database to track these qualities, which are placed on an integer point scale. 
-
-Optionally, the adopter can specify one of the qualities as a **dealbreaker**: if the kitten’s score for that quality is more than 10 points away from the adopter’s preference, you do not recommend it to the adopter.
-
-Write a function which takes in your kitten database `kittens` (dictionary that has kitten names as keys and dictionary with kitten preferences as values) and adopter preferences dictionary `kitten_preference`, calculates a similarity score for each kitten in the database, and returns the name of the optimal kitten.
-
-
-Additionally, your function should also take in a parameter called dealbreaker which can either be the name of a quality in the preference list (e.g. "rowdiness") or None. If a dealbreaker is input into the function, you should not consider any kittens which have a quality score that falls more than 10 points ($>10$) away from the adopter preference. If there are no kittens that are considered, return None.
-
-
-
-
-Hint: use the **means squared error algorithm**. Use the following sample kittens and kitten_preference dictionaries to test your answers:
-
-
-
-
-- kittens = {"blair": {"rowdiness": 100, "hungriness": 100, "cuddliness": 0, "loudness": 27}}
-- kitten_preference = {"rowdiness": 70, "hungriness": 50, "cuddliness": 100, "loudness": 10}
-
-
-
-
-
-
-\ 
-
-
-
-
-
-We can calculate how similar scores are by using a metric called the **mean squared error** (MSE). Essentially, the MSE is a number that determines closeness of the two lines, where the larger the number is, the more different the two lines are. If the MSE is 0 then two lines are identical.
-
-The MSE is computed as follows. 
-
-- For each point in one dataset, compute the difference between it and the corresponding point in the other dataset and then square the difference.
-- Take the average of these squared differences.
-
-
-Write a function `mean_squared_error(numbers1, numbers2)` that takes two lists of numbers (you can assume the lists have the same length and are not empty) and returns the mean squared error between the lists.
 
 
 
