@@ -64,7 +64,7 @@ juice_wrld_top_tracks <- spotifyr::get_artist_top_tracks(juice_wrld_id)
 juice_wrld_top_tracks <- juice_wrld_top_tracks %>%
   dplyr::select('artists', 'name','popularity','album.name')
 
-juice_wrld
+
 
 ```
 
@@ -72,18 +72,20 @@ juice_wrld
 
 
 ```{r, message=FALSE, warning=FALSE}
-x1 <- juice_wrld$track_name[4]
+x1 <- juice_wrld$track_name[3]
 x2 <- juice_wrld$artist_name[3]
 x3 <- juice_wrld$album_name[3]
 
- 
+new_lyrics <- get_lyrics_search(artist_name = x2, song_title = x1)
 
-#get_lyrics <- get_discography(x2) %>%dplyr::filter(track_name == x1)
- 
+tidy_lyrics <- new_lyrics %>% 
+  unnest_tokens(word, line) %>%
+  anti_join(stop_words) # Remove stopwords
 
+# unnest_tokens(bigram, line, token = "ngrams", n = 2)
 
-get_lyrics_search(artist_name = x2, song_title = x1) %>% 
-  unnest_tokens(bigram, line, token = "ngrams", n = 2) # get lyric bigrams
+tidy_lyrics %>%
+  count(word, sort = TRUE)
 ```
 
 ```{r}
