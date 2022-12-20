@@ -114,10 +114,10 @@ data_points_plot <-
 
 
 
-ragg::agg_png(filename = "assets/data_points_plot.png", width = 7085, height = 4295, units = "px", res = 900)
+ragg::agg_png(filename = "assets/static/data_points_plot.png", width = 7085, height = 4295, units = "px", res = 900)
 data_points_plot
 invisible(dev.off())
-knitr::include_graphics("assets/data_points_plot.png")
+knitr::include_graphics("assets/static/data_points_plot.png")
 ```
 
 

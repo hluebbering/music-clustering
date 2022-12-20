@@ -270,7 +270,7 @@ img.poke {
 
 .tocify {
     background-size: cover;
-    /*background-image: url('http://twitter-v3-2.surge.sh/assets/cover.jpg');*/
+    /*background-image: url('http://twitter-v3-2.surge.sh/assets/static/cover.jpg');*/
     background: #ebecf0;
 }
 
@@ -326,7 +326,7 @@ a.navbar-brand {
 
 .navbar.navbar-default.navbar-fixed-top::after {
     content: "";
-    background-image: url("track_header2.png");
+    background-image: url("static/track_header2.png");
     background-size: 105%;
     background-position: 25% 71% !important;
     opacity: 0.75;
