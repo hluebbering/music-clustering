@@ -42,175 +42,7 @@ source('scripts/data.R')
 
 
 
-- Generate a playlist from a song
-- Generate a playlist from a playlist
-- Edit a playlist
-- Get lyrics: determine most used drug names from lyrics
-  - predict mainstream drug usage
-
-
-
-
-
-
-
-
-```{r}
-juice_wrld <- spotifyr::get_artist_audio_features(artist = 'Juice Wrld')
-juice_wrld <- juice_wrld %>% dplyr::select('track_name','artist_name','artist_id','artists','album_release_date','album_name','danceability','energy','key','loudness','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','key_name')
-
-juice_wrld_id <- unique(juice_wrld$artist_id)
-juice_wrld_top_tracks <- spotifyr::get_artist_top_tracks(juice_wrld_id)
-juice_wrld_top_tracks <- juice_wrld_top_tracks %>%
-  dplyr::select('artists', 'name','popularity','album.name')
-
-
-
-```
-
-
-
-
-```{r, message=FALSE, warning=FALSE}
-x1 <- juice_wrld$track_name[3]
-x2 <- juice_wrld$artist_name[3]
-x3 <- juice_wrld$album_name[3]
-
-new_lyrics <- get_lyrics_search(artist_name = x2, song_title = x1)
-
-tidy_lyrics <- new_lyrics %>% 
-  unnest_tokens(word, line) %>%
-  anti_join(stop_words) # Remove stopwords
-
-# unnest_tokens(bigram, line, token = "ngrams", n = 2)
-
-tidy_lyrics %>%
-  count(word, sort = TRUE)
-```
-
-```{r}
-get_lyrics_search(artist_name = "Kanye West",
-                  song_title = "Good Morning") %>%
-  unnest_tokens(bigram, line, token = "ngrams", n = 2) %>%
-  filter(bigram == "good morning") %>% 
-  nrow() # count bigram frequency
-
-
-```
-
-
-
-```{r}
-plotA <- ggplot(data = juice_wrld) +
-  geom_bar(mapping = aes(x=album_name, y = energy),stat = 'identity')  +
-  coord_flip() +
-  hrbrthemes::theme_ipsum_rc() +
-  theme(legend.position = "none")
-
-plotA
-```
-
-
-
-
-
-
-------------------------------------------------
-
-
-
-
-
-## Comparing Multiple Playlists
-
-
-
-<span class = "myhighlight">Overview:</span> Given a list of playlists, find all duplicated songs.
-
-
-
-
-
-
-
-
-### Part 1.
-
-
-Write a function called `common_artists(artists)` that takes in a list of sets representing musical artist names and returns a float representing the fraction of common artists shared among the sets. The **fraction of common artists** is the number of shared artists divided by the total number of unique artists that appeared across all sets. 
-
-
-Our assumptions include that the given list `artists` contains at least one set, although the length of the set may or may not be empty. In the case that artists contains at least one empty set, return 0.0.
-
-
-
-
-By definition, a set is a data structure that contains values where order does not matter and there're no duplicates. To find common elements in both set1 and set2, we run `set1 & set2`.
-
-
-
-<div class = "termy">
-
-
-
-```{python}
-def common_artists(artists):
-  # Create empty dictionary for unique artists
-  artist_counts = dict()
-  
-  # Loop through list of sets
-  for a_set in artists:
-    
-    # Loop through names in set
-    for name in a_set:
-      
-      # Update current artist's count
-      if name in artist_counts:
-        artist_counts[name] += 1
-      else:
-        artist_counts[name] = 1
-  
-  # Total number of unique artists across all sets
-  unique_artists = len(artist_counts)
-  shared_artists = 0
-  
-  # Find artists shared across all sets
-  for freq in artist_counts.values():
-    if freq == len(artists):
-      shared_artists += 1
-      
-      
-  return(float(shared_artists / unique_artists))
-```
-
-
-
-
-
-
-```{python}
-common_artists([
-  {"Kanye West", "Post Malone"}, {"Kanye West", "Miley Cyrus", "Post Malone"},
-  {"Kanye West", "Justin Bieber"}])
-```
-
-
-
-
-</div>
-
-
-
-There is one artist (Kanye West) shared across all sets while there are four unique artists (Kanye West, Post Malone, Miley Cyrus, and Justin Bieber). Thus, our fraction of common artists percentage is $1/4 = 0.25$.
-
-
-
-
-
-
-
-
-
+<span class = "myhighlight">Objective.</span> Using Python, the project goal is to implement a k-means clustering algorithm, a technique often used in machine learning, and use it for data analysis. We write various functions making use of lists, sets, dictionaries, sorting, and graph data structures for computational problem solving and analysis.
 
 
 
@@ -230,55 +62,128 @@ There is one artist (Kanye West) shared across all sets while there are four uni
 
 
 
-### Part 2.
-
-
-<span class = "myhighlight5">Problem 2</span>
-
-
-Write a function called `explore_seattle(seattle_map, curr_location)`, where `seattle_map` is a list of tuples. Each tuple has two elements: the first element is the name of the location and the second element is a tuple containing the x and y-coordinates of the given location. `curr_location` is a tuple giving your x and y-coordinates of your location.
-
-
-You will want to calculate the distance between you and all of the locations and return a list of all the location names. This list should be sorted first by distance between you and the location in ascending order, and any ties in distance are broken by alphabetical order of the location names.
 
 
 
 
+## Background
 
 
 
-The **euclidean distance** is a simple way to calculate the distance between two data points representing the $x$ and $y$-coordinates of the given location. To calculate the euclidean distance, we use the Pythagorean theorem. If we have two data points $a=\left[a_1, a_2, \ldots , a_n\right]$ and $b=\left[b_1, b_2, \ldots , b_n\right]$, where $n$ is the dimension, we define the euclidean distance between both points as
+K-means clustering is a popular machine learning and data mining algorithm that discovers possible clusters within a dataset. Finding these clusters often reveals meaningful information from the data distribution. K-means clustering is used for a number of different applications, such as recognizing hand-written digits, which we will be implementing in this assignment.
+
+
+### Algorithm Overview
+
+<div class = "roundedlist">
+K-means clustering works in four steps:
+
+1. Initialize some number $k$ of cluster centers, also called `centroids`.
+2. For each data point in the dataset, assign it to the closest centroid.
+3. Update the locations of the centroids to be the average of all the points assigned to that cluster.
+4. Repeat steps 2 and 3 until convergence.
+
+</div>
+
+
+Note that the actual data points do not change. Only the locations of the centroids change with each iteration. And as the centroids move, the set containing the data points closest to each centroid alters. Below is an example of a single run of the K-means clustering.
+
+
+```{r,echo=FALSE,eval=TRUE}
+# Step 1. Initial Centroid Placement
+# Step 2. Update Assignments
+# Step 3. Update Centroid Location
+# 
+data_points2 = data.frame(
+  "points" = c("x1", "x2", "x3", "centroid"),
+  "label" = c("(1, 1)", "(2, 3)", "(3, 2)", "Centroid"),
+  "x" = c(1, 2, 3, 2),
+  "y" = c(1, 3, 2, 2))
+
+data_points_plot <- 
+  ggplot(data = data_points2, mapping = aes(x = x, y = y, label = label)) +
+  geom_point(mapping = aes(fill = points), pch = 21, size = 3.25, alpha = 0.9, color = "#030404", stroke = 0.5) +
+  geom_text_repel(point.padding = 5, family = "Roboto Condensed", size = 3.75, fontface = "plain") +
+  scale_fill_manual(values = c(
+    "black", "#61cad1", "#cae278", "#ff99b1",
+    # extra colors
+    "#F0BE43", "#c757c7", "#ff5370")) +
+  theme_ipsum_rc(axis_text_size = 10) + xlim(c(0, 4)) + ylim(c(0, 4)) +
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+
+
+
+
+ragg::agg_png(filename = "assets/data_points_plot.png", width = 7085, height = 4295, units = "px", res = 900)
+data_points_plot
+invisible(dev.off())
+knitr::include_graphics("assets/data_points_plot.png")
+```
+
+
+As with many machine learning techniques, this algorithm consists of a vast list of terminology which we define in a bit more detail below.
+
+
+
+<span class = "myhighlight2">Definition 1. Distance</span> The Euclidean distance, which indicates a straight line, is a simple way to calculate how close a data point is to a centroid. We calculate the euclidean distance using the **Pythagorean theorem**, defined as follows. For two points $a = \left[a_1, a_2, \ldots, a_n\right]$ and $b = \left[b_1, b_2, \ldots, b_n\right]$, where $n$ is the current dimension, we define the euclidean distance between both points as 
+
 
 $$
 \begin{align}
-D (a,b) &=
-\sqrt{(a_1 - b_1)^2 + (a_2-b_2)^2 + \ldots + (a_n-b_n)^2}
+\mathbf{\large\color{darkmagenta} D}(a, b) &= 
+\sqrt{\left(a_1 - b_1\right)^2 + 
+\left(a_2 - b_2\right)^2 + 
+\ldots + \left(a_n - b_n\right)^2}
 \end{align}
 $$
 
 
 
 
+<span class = "myhighlight2">Definition 2. Clusters</span> A cluster is a collection of points that are part of the same group. For k-means, every point is part of a cluster. So as the algorithm progresses and the centroids shift, points might change which cluster they're grouped in, even though the point itself does not move. 
 
 
 
 
+<span class = "myhighlight2">Definition 3. Centroids</span> A centroid is the center of a cluster. In K-means, we assume that the centroid of a cluster is the average location of all the points in that cluster. This is equivalent to the average of the data points' components in each dimension. So if we have three $n$-dimensional points $a$, $b$, and $c$, we define the average as
+
+
+$$
+\mathit{average} = 
+\left[
+\dfrac{a_1 + b_1 + c_1}{3}, \dfrac{a_2 + b_2 + c_2}{3}, \dfrac{a_3 + b_3 + c_3}{3}
+\right]
+$$
 
 
 
-
------------------------------------
-
+<span class = "myhighlight2">Definition 4. Convergence</span> An algorithm converges if the locations of all centroids do not change much between two iterations, e.g. within some threshold of $1 \times 10^{-5}$.
 
 
 
+-------------------------
+
+
+## Part 1. The Algorithm
+
+
+<span class = "myhighlight">Objective.</span> Design and implement a k-means clustering algorithm in Python.
 
 
 
+Specifically, we write the K-means clustering algorithm in the `kmeans.py` file and then run the program on various datasets contained in a nearby directory. To implement the algorithm, we work with the data structures `data` and `centroids`.
 
 
 
+<div class = "datasource2">
+1. `data`: A list of data points, where each data point is a list of numeric float values.
+2. `centroids`: A dictionary of centroids, where the keys are strings (centroid names) and the values are lists (centroid locations).
+</div>
 
-------------------------------------
+
+
+-------------------------
+
+
 
 

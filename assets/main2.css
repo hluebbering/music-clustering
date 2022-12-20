@@ -151,7 +151,7 @@ hr {
     background-color: hsl(228deg 14% 93%);
     text-shadow: 0.25px 0.25px 0.25px hsl(233deg 5% 26% / 85%), 0.35px 0.35px 0.35px hsl(233deg 5% 26% / 85%), 0 -1.1px 0px rgb(12 13 18 / 8%), 0 1.2px 0 rgb(255 255 255);
     color: hsl(233deg 5% 26%);
-    padding: 2pt 4.125pt;
+    padding: 1.25pt 4pt;
     font-weight: 300;
     image-rendering: pixelated;
     border-radius: 3px;
@@ -163,7 +163,6 @@ hr {
     border-left-color: #d15cb4;
     border-right-color: #d15cb4;
     border-bottom-color: #7435a8;
-    box-shadow: -7px 7px 0 rgb(0 0 0 / 30%);
 }
 
 .myhighlight3 {
@@ -196,22 +195,6 @@ hr {
 }
 
 
-.myhighlight5 {
-    text-align: center;
-    display: inline-flex;
-    height: 24pt;
-    padding: 6pt 12pt 0pt 12pt;
-    box-shadow: 0.45px 1.5px 1.5px 0 rgb(0 0 0 / 12%), 0 1px 1px 0px rgb(0 0 0 / 24%), inset 0.75px 0.75px 0.5px 0 white;
-    font-size: 9.25pt;
-    background-image: linear-gradient( 30deg, hsl(315deg 100% 40% / 55%), #ffac70d9, hsl(355deg 100% 50% / 55%) );
-    background-size: cover;
-    background-position: center center;
-    border: 1.125px solid hsl(315deg 100% 50% / 30%);
-    border-radius: 1rem;
-    font-family: Roboto Condensed;
-    font-weight: 600;
-    text-transform: uppercase;
-}
 
 
 img.poke {
@@ -260,6 +243,18 @@ img.poke {
     font-weight: 400;
     background: linear-gradient(36deg, hsl(340deg 100% 76%)20%, hsl(10deg 100% 68%) 50%, #ffaf7b 70%);
     border: 0.25px solid transparent;
+    
+        border-radius: 6px;
+    text-shadow: 0.6px 0.6px 0 #fff;
+    color: #61677c;
+    font-weight: 400;
+    box-shadow: 0.125em 0.125em 0.125em 0px #ffffff inset, -0.125em -0.125em 0.125em -0.125px hsl(240deg 1% 55% / 25%) inset, 0.025em 0.1em 0.25em -0.3px rgb(114 114 116), -0.1em -0.1em 0.25em -0.75px #ffffff;
+    background: linear-gradient(145deg, hsl(228deg 10% 99% / 50%), hsl(228deg 14% 91% / 50%));
+    padding: 4.5px 5.5px;
+    font-size: 9pt;
+    font-weight: 600;
+    color: hsl(275deg 100% 70%) !important;
+    text-shadow: 0 0 1px hsl(275deg 100% 55% / 50%), 0.6px 0.6px 0 #fff;
 }
 
 #TOC {
@@ -331,7 +326,7 @@ a.navbar-brand {
 
 .navbar.navbar-default.navbar-fixed-top::after {
     content: "";
-    background-image: url("C:/Users/Hannah Luebbering/OneDrive/Documents/GitHub/playlist_report/assets/track_header2.png");
+    background-image: url("track_header2.png");
     background-size: 105%;
     background-position: 25% 71% !important;
     opacity: 0.75;
@@ -467,6 +462,7 @@ code {
     font-weight: 300;
 }
 
+
 /* ---- datasource2 style ---- */
 
 .datasource2 {
@@ -476,8 +472,6 @@ code {
     border-radius: 13px;
     background: hsl(220deg 14% 95%);
     padding: 5pt 10pt;
-    background: linear-gradient(to bottom, #33383e 0%, #17191d 100%);
-    border: solid 2px #3e434c
 }
 
 
@@ -630,27 +624,6 @@ code {
     font-family: 'Fira Sans Condensed';
     color: white;
     font-weight: 400;
-    display: flex;
-    position: relative;
-    z-index: 2 !important;
-}
-
-
-.roundedlist::after {
-    background-image: url(https://i.pinimg.com/originals/17/a9/02/17a902407c603a93c20204993c74c9ca.jpg) !important;
-    content: "";
-    background-size: cover !important;
-    background-position: 0 0%!important;
-    opacity: 0.5;
-    top: 0px;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    display: flex;
-    z-index: -1 !important;
-    filter: blur(0.125px);
-    border-radius: 10px;
 }
 
 .roundedlist li::marker {
@@ -740,358 +713,18 @@ code {
 }
 
 .roundedlist code {
+    box-shadow: -2px -2px 5px #212121, 2px 2px 5px #141414;
     padding: 3.5px 4px;
+    color: hsl(318deg 50% 50%);
     background: hsl(227deg 4% 15%);
     font-size: 9pt;
     text-shadow: 1px 1px 1px black;
+    box-shadow: 0px -3px 2px 0px #212428 inset, 0px 2px 2px #535d65 inset, 0px 2px 2px -1px #050606, 0px 7px 4px -1px #1a1d1f;
+    border: 0.5px solid #15181a;
     background: linear-gradient(#3c4349, #252a2d);
     font-family: 'Inconsolata';
     font-weight: 400 !important;
-    letter-spacing: 0px !important;
-    padding: 0 !important;
 }
-
-
-.roundedlist pre.python::before {
-    top: -2.5pt;
-    padding: 0.75pt 2pt;
-    width: 32pt;
-    margin: -6pt -14pt;
-}
-
-
-
-.roundedlist li::before {
-    content: '';
-    display: inline-flex;
-    width: 7pt;
-    height: 7pt;
-    border-radius: 18px;
-    vertical-align: middle;
-    margin: 0px 4pt 2pt -12pt;
-    color: hsl(0deg 0% 92%);
-    background: linear-gradient(#3c4349, #252a2d);
-    box-shadow: 0px -3px 2px 0px #212428 inset, 0px 2px 2px #535d65 inset, 0px 2px 2px -1px #050606, 0px 7px 4px -1px #1a1d1f;
-    text-shadow: 0px 1px 1px #33393e, 0 0 0 black, 0px 1px 1px #33393e;
-}
-
-
-/* ---- blockquote style ---- */
-
-
-.roundedlist pre.python {
-      background: linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-    border: 1.5pt outset rgba(255, 255, 255, 0.3);
-    width: 98%;
-    margin: 10pt auto !important;
-    padding: 12pt 18pt;
-    display: block;
-    backdrop-filter: blur(6px);
-}
-
-
-.termy {
-      width: 100%;
-    flex-shrink: 0;
-    color: #FFFFFF;
-    font-size: 15px;
-    line-height: 18px;
-}
-
-.termy pre.python code {
-  /*width: 100%;*/
-    flex-shrink: 0;
-    color: #FFFFFF;
-    padding: 60px 30px 30px 30px !important;
-    font-size: 13px !important;
-    line-height: 18px;
-    display: block;
-    overflow-x: auto;
-    padding: 6pt !important;
-    background: #282a36;
-    margin: 0 !important;
-}
-
-.termy pre.python {
-  width: 500px;
-  width: 98% !important;
-    border-radius: 10px;
-    position: relative;
-    background: #282B36;
-    margin: 10pt auto;
-    box-shadow: 0 10px 40px 0 rgb(40 43 54 / 30%);
-    background: rgba(255,255,255,0.1);
-    border-top: 1px solid rgba(255,255,255,0.5);
-    border-left: 1px solid rgba(255,255,255,0.5);
-    backdrop-filter: blur(5px);
-    background-color: #1c2129;
-}
-
-
-.termy span.bash::before {
-    content: ">> ";
-    color: hotpink;
-}
-
-
-.termy pre:not([class]) {
-    background: hsl(0deg 0% 96% / 50%);
-    border: none !important;
-    display: block;
-    width: 90% !important;
-    /*width: 500px;*/
-    margin: auto;
-    margin-top: -10pt;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-pre.python {
-    box-shadow: 20px 20px 50px rgb(0 0 0 / 50%);
-    border-radius: 15px;
-    background: rgba(255,255,255,0.1);
-    border-top: 1px solid rgba(255,255,255,0.5);
-    border-left: 1px solid rgba(255,255,255,0.5);
-    backdrop-filter: blur(5px);
-}
-
-
-pre.python::before {
-    content: "python";
-    font-size: 7.5pt;
-    background: rgba(224,224,224,.2);
-    box-shadow: 0 2px 0 0 rgb(0 0 0 / 20%);
-    justify-content: center;
-    color: #ccc;
-    position: relative;
-    top: -10px;
-    float: right;
-    display: flex;
-    overflow: hidden;
-    width: 38px;
-    margin: 0pt -6pt;
-    padding: 0.5px 2pt 0.5px 2pt;
-    border-radius: 4pt;
-    font-weight: 300;
-    font-family: rubik;
-}
-
-
-pre.r::before {
-    content: "r";
-    font-size: 7.5pt;
-    background: rgba(224,224,224,.2);
-    box-shadow: 0 2px 0 0 rgb(0 0 0 / 20%);
-    justify-content: center;
-    color: #ccc;
-    position: relative;
-    top: -10px;
-    float: right;
-    display: flex;
-    overflow: hidden;
-    width: 18px;
-    margin: 0pt -6pt;
-    padding: 0.5px 2pt 0.5px 2pt;
-    border-radius: 4pt;
-    font-weight: 300;
-    font-family: rubik;
-}
-
-
-.hljs-keyword {
-    text-shadow: 0.55px 0px 0.5px hsl(320deg 100% 60% / 50%), 0.5px 0.5px 1px hsl(0deg 0% 0%), 0px 1px 0.25px rgb(0 0 0) !important;
-    font-weight: 700;
-    color: #C3E88D;
-    color: #EE0F88;
-    color: #DCBFF2;
-    color: #D58FDB;
-    color: #d167b5;
-    color: #CB602D;
-    color: hsl(263deg 100% 62%);
-    color: #d867e499;
-    color: #f1fa8c;
-    font-weight: 700;
-    color: #af2896;
-}
-
-.hljs-comment {
-    color: hsl(0deg 0% 60%);
-    font-style: normal !important;
-    font-weight: 300;
-    color: #6272a4;
-}
-
-.hljs-string {
-  /*color: #98C379;
-  color: #56B6C2;
-  color: #C3E88D;*/
-    text-shadow: 0.25px 0.25px 1px #111111, 0.25px 0.25px 0.5px black !important;
-    font-weight: 300;
-    color: #82a452;
-    color: #6A9955 !important;
-    color: hsl(197deg 50% 50%);
-    color: #009e9e;
-    color: #5F8658 !important;
-    
-}
-
-.hljs-title {
-    color: #D9BCEF;
-    color: #77DFEF;
-    color: #A771FE;
-    color: #CB602D;
-    color: #a1c2ed;
-    color: #7EB3FF;
-    color: #C3E88D;
-    color: #e4c2ff;
-    text-shadow: 0.25px 0px 0.75px hsl(263deg 100% 60% / 85%), 0.5px 0.5px 1px hsl(0deg 0% 0%), 0px 1px 0.25px rgb(0 0 0) !important;
-        color: hsl(317deg 92% 76%);
-    color: #ff80b5;
-    color: #ff79c6;
-    color: #fa9ebd;
-    color: #f1fa8c;
-}
-
-
-
-.hljs-bashkey {
-  font-weight: 900;
-  color: hsl(300deg 50% 56%);
-    /* color: #862d71; */
-    /* color: hsl(314deg 45% 50%); */
-}
-
-.hljs-pybuilt, .hljs-models {
-    font-weight: 600;
-    color: #ff6188;
-    color: #FF4791;
-    color: #EE0F88;
-    text-shadow: 0.5px 0px 0.25px hsl(345deg 100% 30%), 0.5px 0.5px 1px hsl(0deg 0% 0%), 0px 1px 0.25px rgb(0 0 0) !important;
-        color: #fa9ebd;
-    font-weight: 500;
-}
-
-.hljs-pykey {
-    font-weight: 500;
-    color: hsl(346deg 100% 78%);
-    color: #D58FDB;
-    color: #CB602D;
-    color: #ff6057;
-    color: #FFC24C;
-}
-
-
-
-
-.hljs-pypd {
-    color: #89DDFF;
-    font-weight: 500;
-    color: hsl(334deg 80% 58%);
-}
-
-.hljs-myfunc {
-    font-weight: 400;
-    color: #FF7F9D;
-    color: #EBA4AC;
-    color: #A771FE;
-    color: #6dd5ed;
-}
-
-.hljs-pyfunc {
-    font-weight: 400;
-    color: #A2C2EB;
-    color: #D58FDB;
-    color: #fad481;
-}
-
-.hljs-literal {
-    color: lightgreen;
-    color: hsl(270deg 100% 70%);
-
-}
-
-.hljs-number {
-    font-weight: 600;
-    text-shadow: 0.25px 0.25px 1px #111111, 0.25px 0.25px 0.5px black !important;
-    color: #7EB3FF;
-    color: #a1c2ed;
-    color: #f859ca;
-    color: #ff80b5;
-    color: #fa9ead;
-    color: #8be9fd;
-    color: #d4fc79;
-    color: #96e6a1;
-    font-weight: 700;
-}
-
-.hljs-keyfunc {
-    color: hsl(248deg 91% 75%) !important;
-    font-weight: 400;
-}
-
-
-
-
-
-pre.sample, pre.bash {
-    border-radius: 10px;
-    overflow: hidden;
-    padding: 0px !important;
-    box-shadow: 4px 4px 12px 1px rgb(0 0 0 / 20%) !important;
-    background: #f5f5f5 !important;
-    backdrop-filter: blur(0.6px) !important;
-    border-bottom: 2px solid hsl(0deg 0% 60% / 20%) !important;
-}
-
-pre.sample::before,
-pre.bash::before{
-    line-height: 1.75;
-    font-size: 8pt;
-    color: #FFF;
-    padding: 0 10pt;
-    letter-spacing: 1px;
-    content: "pseudo code";
-    width: 100%;
-    height: 14pt;
-    display: flex;
-    /*background: linear-gradient(320deg, #ad1f8c,#7a005e, #bf66ff);
-    box-shadow: 20px 20px 40px -6px rgb(0 0 0 / 20%) !important;
-    backdrop-filter: blur(0.6px);
-    border-bottom: 2px solid rgba( 255, 255, 255, 0.18 );*/
-    background-image: linear-gradient(206deg, RGBA(67, 95, 218, .085) 0%, RGBA(216, 65, 92, .025) 260%) !important;
-    box-shadow: 0 12px 24px -10px rgb(89 113 218 / 38%), 0 2px 3px 0 rgb(63 79 153 / 24%), 0 9px 2px -8px rgb(52 66 128 / 24%), inset -1px -1px 1px 0 rgb(255 255 255) !important;
-}
-
-.sample code,
-.bash code {
-    border-left: 2px dashed #f2e0ff;
-    border-right: 2px dashed #f2e0ff;
-    padding: 8pt 10pt 8pt 10pt;
-    line-height: 1.5;
-    display: block;
-    color: black !important;
-    text-shadow: none !important;
-    font-family: 'Inconsolata';
-    font-family: "Fira Mono", monospace !important;
-}
-
-
-
 
 
 
