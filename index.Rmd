@@ -29,7 +29,7 @@ library(tidytext)
 library(geniusr)
 library(dplyr)
 
-source('scripts/data.R')
+# source('scripts/data.R')
 ```
 
 
