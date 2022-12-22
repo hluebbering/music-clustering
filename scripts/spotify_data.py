@@ -1,26 +1,29 @@
 import csv
-from operator import index
+import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import pandas as pd
-import time
+from operator import index
 
 # Set client id and client secret
 client_id = '4cf3afdca2d74dc48af9999b1b7c9c61'
 client_secret = 'f6ca08ad37bb41a0afab5ca1dc74b208'
 
-# Spotify authentication
+# Spotify authentication token
 client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
-
-
 # Get playlist song features and artist info
-def playlistTracks(id, artist_ids):
+def playlistTracks(id, artist_id, playlist_id):
+    
+    # Create Spotify API client variables
     meta = sp.track(id)
-    features = sp.audio_features(id)
-    artist_info = sp.artist(artist_ids)
+    audio_features = sp.audio_features(id)
+    artist_info = sp.artist(artist_id)
+    playlist_info = sp.playlist(playlist_id)
 
     # Metadata
     name = meta['name']
@@ -37,62 +40,76 @@ def playlistTracks(id, artist_ids):
     artist_genres = artist_info["genres"]
 
     # Track features
-    acousticness = features[0]['acousticness']
-    danceability = features[0]['danceability']
-    energy = features[0]['energy']
-    instrumentalness = features[0]['instrumentalness']
-    liveness = features[0]['liveness']
-    loudness = features[0]['loudness']
-    speechiness = features[0]['speechiness']
-    tempo = features[0]['tempo']
-    valence = features[0]['valence']
-    key = features[0]['key']
-    mode = features[0]['mode']
-    time_signature = features[0]['time_signature']
+    acousticness = audio_features[0]['acousticness']
+    danceability = audio_features[0]['danceability']
+    energy = audio_features[0]['energy']
+    instrumentalness = audio_features[0]['instrumentalness']
+    liveness = audio_features[0]['liveness']
+    loudness = audio_features[0]['loudness']
+    speechiness = audio_features[0]['speechiness']
+    tempo = audio_features[0]['tempo']
+    valence = audio_features[0]['valence']
+    key = audio_features[0]['key']
+    mode = audio_features[0]['mode']
+    time_signature = audio_features[0]['time_signature']
+    
+    # Basic playlist info
+    playlist_name = playlist_info['name']
 
     return [name, track_id, album, artist, artist_id, release_date, length, popularity, 
             artist_pop, artist_genres, acousticness, danceability, 
             energy, instrumentalness, liveness, loudness, speechiness, 
-            tempo, valence, key, mode, time_signature]
-            
+            tempo, valence, key, mode, time_signature, playlist_name]
 
 
+# Spotify Playlists Data Extraction
+# List of Spotify owned playlists
+plLinks = ['https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M?si=3ddeaba6c1fb4aaf',
+           'https://open.spotify.com/playlist/37i9dQZF1DX0kbJZpiYdZl?si=6adee497221b41b1',
+           'https://open.spotify.com/playlist/37i9dQZF1DX4JAvHpjipBk?si=03e877de87e8476d',
+           'https://open.spotify.com/playlist/37i9dQZF1DX11otjJ7crqp?si=1cc221e41e1d4a16',
+           'https://open.spotify.com/playlist/37i9dQZF1DWT5MrZnPU1zD?si=77201ffcf60449a3',
+           'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd?si=24cb78119dd44fc0',
+           'https://open.spotify.com/playlist/37i9dQZF1DXcRXFNfZr7Tp?si=a2a749e2802e4e1a',
+           'https://open.spotify.com/playlist/37i9dQZF1DX2RxBh64BHjQ?si=9503cb431d684f7c']
 
-# Spotify playlist url
-playlist_link = "https://open.spotify.com/playlist/4lSykOrQfnAiCgtHKVudTT"
-playlist_link = "https://open.spotify.com/playlist/1nvpVNmzL7Vi1pXcQEiaLx?si=a62187de23924f4c"
-playlist_URI = playlist_link.split("/")[-1].split("?")[0]
+playlist_ids = []
+track_ids = []
+artist_ids = []
 
-# Extract song ids and artists from playlist
-track_ids = [x1["track"]["id"]
-             for x1 in sp.playlist_tracks(playlist_URI)["items"]]
-artist_uris = [x2["track"]["artists"][0]["uri"]
-               for x2 in sp.playlist_tracks(playlist_URI)["items"]]
-
-
+for link in plLinks:
+    uri = link.split("/")[-1].split("?")[0]  
+    
+    for x1 in sp.playlist_tracks(uri)["items"]:   
+        song = x1['track'] 
+        
+        if song == None:
+            continue     
+        
+        track_ids.append(song["id"])
+        artist_ids.append(song["artists"][0]["uri"])
+        playlist_ids.append(uri)
+        
 # Loop over track ids
-tracks = []
-for i in range(len(track_ids)):
+all_tracks = []
+for i in range(len(track_ids2)):
     time.sleep(.5)
-    track = playlistTracks(track_ids[i], artist_uris[i])
-    tracks.append(track)
-    
-    
-# Save the playlist name for each song
-playlist_name = sp.user_playlist(user = None, playlist_id = playlist_URI, fields="name")
-for x in tracks:
-    x.append(playlist_name['name'])
-    
+    get_features = playlistTracks(track_ids[i], artist_ids[i], playlist_ids[i])
+    all_tracks.append(get_features)
     
 # Create dataframe
-df = pd.DataFrame(
-    tracks, columns=['name', 'track_id', 'album', 'artist', 'artist_id','release_date',
+spotify_playlists = pd.DataFrame(
+    all_tracks, columns=['name', 'track_id', 'album', 'artist', 'artist_id','release_date',
                      'length', 'popularity', 'artist_pop', 'artist_genres',
                      'acousticness', 'danceability', 'energy',
                      'instrumentalness', 'liveness', 'loudness',
                      'speechiness', 'tempo', 'valence', 'key', 'mode',
                      'time_signature', 'playlist'])
+
 # Save to csv file
-df.to_csv("spotify.csv", sep=',')
+spotify_playlists.to_csv("data/spotify_playlists.csv", sep=',')
+
+spotify_playlists['playlist'].value_counts()
+
 
 

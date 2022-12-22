@@ -200,38 +200,17 @@ hr {
 .list-group-item.active,
 .list-group-item.active:focus,
 .list-group-item.active:hover {
-        text-shadow: 0.5px 0.5px 0.5px hsl(0deg 0% 30% / 45%);
-    font-weight: 700;
-    font-family: 'Fira Sans Condensed', sans-serif;
-    background-image: linear-gradient(to right, #ed6ea0 0%, #ec8c69 100%);
+            font-family: 'Fira Sans Condensed', sans-serif;
     text-transform: uppercase;
-    box-shadow: inset 0.1rem 0.1rem 0.5rem rgb(0 0 0 / 15%), 0 0.25px 3.75px 0 #ff99f8;
-        border-color: #b70074;
     background-image: linear-gradient(to right, #FF1EAD, #b70074, #9e0064, #b70074, #FF1EAD);
-        padding: 3px 4px;
-    color: #61677c;
-    font-family: 'Inconsolata';
-    font-size: 8.5pt;
     letter-spacing: 0.25px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 10%), 0 1px 2px rgb(0 0 0 / 20%), inset 1px 1px 1px rgb(255 255 255 / 50%), inset -1px -1px 1px rgb(12 13 18 / 6%), -1px -1px 1px 0px rgb(255 255 255 / 60%), -1px -1px 4px 0px rgb(255 255 255 / 60%), -2px -2px 8px 0px rgb(255 255 255 / 60%), 1px 1px 1px 0px rgb(12 13 18 / 6%), 1px 1px 4px 0px rgb(12 13 18 / 6%), 2px 2px 8px 0px rgb(12 13 18 / 6%);
-    background-color: hsl(228deg 14% 93%);
-    text-shadow: 0.25px 0.25px 0.25px hsl(233deg 5% 26% / 85%), 0.35px 0.35px 0.35px hsl(233deg 5% 26% / 85%), 0 -1.1px 0px rgb(12 13 18 / 8%), 0 1.2px 0 hsl(0deg 0% 100%);
-    color: hsl(233deg 5% 20%);
-    font-weight: 400;
-    background: linear-gradient(36deg, hsl(340deg 100% 76%)20%, hsl(10deg 100% 68%) 50%, #ffaf7b 70%);
-    border: 0.25px solid transparent;
-    
-        border-radius: 6px;
-    text-shadow: 0.6px 0.6px 0 #fff;
-    color: #61677c;
-    font-weight: 400;
     box-shadow: 0.125em 0.125em 0.125em 0px #ffffff inset, -0.125em -0.125em 0.125em -0.125px hsl(240deg 1% 55% / 25%) inset, 0.025em 0.1em 0.25em -0.3px rgb(114 114 116), -0.1em -0.1em 0.25em -0.75px #ffffff;
     background: linear-gradient(145deg, hsl(228deg 10% 99% / 50%), hsl(228deg 14% 91% / 50%));
     padding: 4.5px 5.5px;
     font-size: 9pt;
     font-weight: 600;
     color: hsl(275deg 100% 70%) !important;
+    color: hsl(321deg 64% 61%) !important;
     text-shadow: 0 0 1px hsl(275deg 100% 55% / 50%), 0.6px 0.6px 0 #fff;
 }
 
@@ -304,8 +283,9 @@ a.navbar-brand {
 
 .navbar.navbar-default.navbar-fixed-top::after {
     content: "";
-    background-image: url("static/track_header2.png");
-    background-size: 105%;
+    /*background-image: url("static/track_header2.png");*/
+    background-image: url("https://raw.githubusercontent.com/hluebbering/playlist_report/main/assets/static/my_playlists2.png");
+    background-size: 35%;
     background-position: 25% 71% !important;
     opacity: 0.75;
     top: 0px;
@@ -696,5 +676,11 @@ code {
 
 
 
+/* ---- NODES ---- */
 
 
+g#main-nodes {
+    filter: drop-shadow(1px 1px 1px hsl(0deg 0% 0% / 50%)) saturate(1.25);
+    scale: 1.2;
+    translate: -10% -10%;
+}
