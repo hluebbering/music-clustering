@@ -17,7 +17,7 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
 # Get playlist song features and artist info
-def playlistTracks(id, artist_id, playlist_id):
+def playlist_features(id, artist_id, playlist_id):
     
     # Create Spotify API client variables
     meta = sp.track(id)
@@ -63,8 +63,7 @@ def playlistTracks(id, artist_id, playlist_id):
 
 
 # Spotify Playlists Data Extraction
-# List of Spotify owned playlists
-plLinks = ['https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M?si=3ddeaba6c1fb4aaf',
+playlist_links = ['https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M?si=3ddeaba6c1fb4aaf',
            'https://open.spotify.com/playlist/37i9dQZF1DX0kbJZpiYdZl?si=6adee497221b41b1',
            'https://open.spotify.com/playlist/37i9dQZF1DX4JAvHpjipBk?si=03e877de87e8476d',
            'https://open.spotify.com/playlist/37i9dQZF1DX11otjJ7crqp?si=1cc221e41e1d4a16',
@@ -73,30 +72,31 @@ plLinks = ['https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M?si=3ddeaba6
            'https://open.spotify.com/playlist/37i9dQZF1DXcRXFNfZr7Tp?si=a2a749e2802e4e1a',
            'https://open.spotify.com/playlist/37i9dQZF1DX2RxBh64BHjQ?si=9503cb431d684f7c']
 
-playlist_ids = []
 track_ids = []
 artist_ids = []
+playlist_ids = []
 
-for link in plLinks:
-    uri = link.split("/")[-1].split("?")[0]  
+for link in playlist_links:
+    playlist_URI = link.split("/")[-1].split("?")[0]
     
-    for x1 in sp.playlist_tracks(uri)["items"]:   
-        song = x1['track'] 
-        
-        if song == None:
-            continue     
-        
-        track_ids.append(song["id"])
-        artist_ids.append(song["artists"][0]["uri"])
-        playlist_ids.append(uri)
-        
+    # Iterate over list of tracks in playlist
+    for i in sp.playlist_tracks(playlist_URI)["items"]:   
+        if i['track'] == None:
+            continue          
+
+        track_ids.append(i['track']["id"]) # Extract song id
+        artist_ids.append(i['track']["artists"][0]["uri"]) # Extract artist id
+        playlist_ids.append(playlist_URI)
+
+
 # Loop over track ids
 all_tracks = []
-for i in range(len(track_ids2)):
+for i in range(len(track_ids)):
     time.sleep(.5)
-    get_features = playlistTracks(track_ids[i], artist_ids[i], playlist_ids[i])
-    all_tracks.append(get_features)
-    
+    track_feat = playlist_features(track_ids[i], artist_ids[i], playlist_ids[i])
+    all_tracks.append(track_feat)
+
+
 # Create dataframe
 spotify_playlists = pd.DataFrame(
     all_tracks, columns=['name', 'track_id', 'album', 'artist', 'artist_id','release_date',
@@ -106,9 +106,9 @@ spotify_playlists = pd.DataFrame(
                      'speechiness', 'tempo', 'valence', 'key', 'mode',
                      'time_signature', 'playlist'])
 
+
 # Save to csv file
 spotify_playlists.to_csv("data/spotify_playlists.csv", sep=',')
-
 spotify_playlists['playlist'].value_counts()
 
 

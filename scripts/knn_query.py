@@ -1,10 +1,15 @@
+import csv
+import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from operator import index
 
 
 # Get songs from a playlist
-df = pd.read_csv('playlists.csv', encoding_errors='ignore', index_col=0, header=0)
+df = pd.read_csv('data/my_playlist.csv', encoding_errors='ignore', index_col=0, header=0)
 dfCopy = df.copy(deep = True)
 dfCopy = dfCopy.drop(dfCopy[dfCopy.playlist != 'but my feet in bottega'].index)
 
@@ -14,16 +19,14 @@ rows, cols = dfCopy.shape
 print(f'Number of songs: {rows}')
 print(f'Number of attributes per song: {cols}')
 
+
 # Get a song string search
 def getMusicName(elem):
     return f"{elem['artist']} - {elem['name']}"
 
 # Select song and get track info
 anySong = dfCopy.loc[15]
-anySongName = getMusicName(anySong)
-print('name:', anySongName)
-
-
+print('name:', getMusicName(anySong))
 
 
 # k-Nearest Neighbors (KNN)
@@ -62,66 +65,66 @@ def querySimilars(df, columns, idx, func, param):
 ######### EXAMPLE 1. KNN Query #########
 
 # Select song and column attributes
-songIndex = 6 # query point
+query_point = 6 # query_point
 columns = ['acousticness', 'danceability', 'energy', 'speechiness', 'valence','tempo']
 
 # Set query parameters
 func, param = knnQuery, 3
 
 # Implement query
-response = querySimilars(df, columns, songIndex, func, param)
+response = querySimilars(df, columns, query_point, func, param)
 
 print("---- Query Point ----")
-print(getMusicName(df.loc[songIndex]))
+print(getMusicName(df.loc[query_point]))
+
 print('---- k = 3 similar songs ----')
-for track_id in response[0]:
-    track_name = getMusicName(df.loc[track_id])
+for track_index in response[0]:
+    track_name = getMusicName(df.loc[track_index])
     print(track_name)
+
 print('---- k = 3 nonsimilar songs ----')
-for track_id in response[1]:
-    track_name = getMusicName(df.loc[track_id])
+for track_index in response[1]:
+    track_name = getMusicName(df.loc[track_index])
     print(track_name)
     
+    
+
 ##########################################
 
+similar_count = {} # Similar songs count
+nonsimilar_count = {} # Non-similar songs count
 
-
-
-similar = {} # Similar songs count
-nonsimilar = {} # Non-similar songs count
-
-for trackID in df.index:
-    response = querySimilars(df, columns, trackID, func, param)
-
-    # Get similar song ids and info
-    for similarID in response[0]:
-        track = getMusicName(df.loc[similarID])
-        if track in similar:
-            similar[track] += 1
+for track_index in df.index:
+    response = querySimilars(df, columns, track_index, func, param)
+    
+    # Get similar songs
+    for similar_index in response[0]:
+        track = getMusicName(df.loc[similar_index])
+        if track in similar_count:
+            similar_count[track] += 1
         else:
-            similar[track] = 1
-
-    # Get non-similar song ids and info
-    for nonsimilarID in response[1]:
-        track = getMusicName(df.loc[nonsimilarID])
-        if track in nonsimilar:
-            nonsimilar[track] += 1
+            similar_count[track] = 1
+    # Get non-similar songs
+    for nonsimilar_index in response[1]:
+        track = getMusicName(df.loc[nonsimilar_index])
+        if track in nonsimilar_count:
+            nonsimilar_count[track] += 1
         else:
-            nonsimilar[track] = 1
-
+            nonsimilar_count[track] = 1
 
 
 # Nonsimilar tracks from given playlist
-nonsimilar = dict(sorted(nonsimilar.items(), key=lambda item: item[1], reverse=True))
+nonsimilar = dict(sorted(nonsimilar_count.items(), key=lambda item: item[1], reverse=True))
 print('---- NON SIMILAR SONG COUNTS ----')
-for song, songCount in nonsimilar.items():
-    if songCount >= 8:
-        print(song, ':', songCount)
+for track_name, track_count in nonsimilar.items():
+    if track_count >= 8:
+        print(track_name, ':', track_count)
+
 
 # Similar tracks from given playlist
-similar = dict(sorted(similar.items(), key=lambda item: item[1], reverse=True))
+similar = dict(sorted(similar_count.items(), key=lambda item: item[1], reverse=True))
 print('---- SIMILAR SONG COUNTS ----')
-for song, song_count in similar.items():
-    if song_count >= 8:
-        print(song, ':', song_count)
+for track_name, track_count in similar.items():
+    if track_count >= 5:
+        print(track_name, ':', track_count)
         

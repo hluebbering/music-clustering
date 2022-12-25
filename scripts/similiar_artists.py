@@ -8,17 +8,25 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from operator import index
 
 
+# Set client id and client secret
+client_id = '4cf3afdca2d74dc48af9999b1b7c9c61'
+client_secret = 'f6ca08ad37bb41a0afab5ca1dc74b208'
+
+# Spotify authentication token
+client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
+sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
+
+
 # Count distinct values in pandas column
 tallyArtists = df.value_counts(["artist", "artist_id"]).reset_index(name='counts')
 topArtist = tallyArtists['artist_id'][1]
 tallyArtists.head(4)
 
 
-
-
 # Create links table
 a = sp.artist(topArtist)
 ra = sp.artist_related_artists(topArtist)
+
 # Dictionary of lists 
 links_dict = {"source_name":[],"source_id":[],"target_name":[],"target_id":[]};
 for artist in ra['artists']:
@@ -40,7 +48,6 @@ for i in range(0, 4):
 
 # Convert links dict to dataframe
 links = pd.DataFrame(links_dict) 
-
 # Export to excel sheet             
 links.to_excel("links.xlsx", index = False)
 
@@ -63,6 +70,5 @@ for id in all_artist_ids:
 
 # Convert links dict to dataframe
 points = pd.DataFrame(points_dict) 
-
 # Export to excel sheet             
 points.to_excel("points.xlsx", index = False)

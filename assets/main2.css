@@ -376,21 +376,15 @@ pre {
     box-shadow: 0 2px 2px #888;
     padding: 10pt;
     margin-bottom: 14pt;
+    margin-top: 14pt;
     background: #212121;
     background: #2d2d2d;
     background: #2D2A2E;
     background: #25252d;
 }
 
-pre:not([class]) {
-    background-color: #2d2d2d;
-    background: #222;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 1px solid black;
-    color: #6b635b;
-    text-shadow: 0 1px 0 rgb(0 0 0 / 44%);
-    -webkit-box-shadow: -1px 5px 8px rgb(0 0 0 / 60%);
-}
+
+
 
 pre code {
     font-family: 'Inconsolata', monospace;
@@ -684,3 +678,38 @@ g#main-nodes {
     scale: 1.2;
     translate: -10% -10%;
 }
+
+
+
+/* ---- BASH ---- */
+
+span.bash .hljs-comment {
+    font-family: 'Inconsolata';
+    font-style: normal !important;
+    color: hsl(240deg 10% 35%);
+    text-shadow: 0.35px 0.35px 0.5px hsl(0deg 0% 50%), -0.5px -0.5px 0.5px #ffffff;
+    font-size: 13px;
+    letter-spacing: 0.25px;
+}
+
+code.hljs.shell {
+    margin: -10px 0px;
+}
+
+pre:not([class]) {
+    background: hsl(0deg 0% 96%);
+    box-shadow: none;
+    border: none;
+    display: inline-flex;
+    width: 95%;
+    flex-wrap: wrap;
+    margin-bottom: -2px;
+    margin-top: -2px;
+    border: 1px solid hsl(0deg 0% 95%);
+    border-radius: 1px;
+    line-height: 1;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    align-items: center;
+}
+
