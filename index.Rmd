@@ -1,5 +1,5 @@
 ---
-title: "Data Programming with Python"
+title: "Spotify Playlist Analysis with Python"
 author: "Hannah Luebbering"
 date: "July 04, 2022"
 output: 
@@ -393,7 +393,8 @@ ra = sp.artist_related_artists(topArtist)
 ```
 
 
-```{python,echo=TRUE}
+
+```{python}
 # dictionary of lists 
 links_dict = {"source_name":[],"source_id":[],"target_name":[],"target_id":[]};
 for artist in ra['artists']:
@@ -406,38 +407,29 @@ for artist in ra['artists']:
 
 
 
+We retrieve similar data for the nodes of the connection graph, creating a list that holds all of the artist source ids and target ids from the previous code. Here’s a sample of the result when we query Spotify for the artists most similar to Post Malone, according to listener behavior.
+
+
 
 ```{python}
 pd.DataFrame(links_dict).head()
 ```
 
-
-
-### Nodes
-
-We retrieve similar data for the nodes of the connection graph, creating a list that holds all of the artist source ids and target ids from the previous code. 
-
-```python
-# create "points" table             
-all_artist_ids = list(set(links_dict['source_id'] + links_dict['target_id']))
-```
-
 \ 
 
 
-
-The following visualization is based on the [Spotify Similiar Artists API](https://unboxed-analytics.com/data-technology/visualizing-rap-communities-wtih-python-spotifys-api/) article and created with flourish studio.
+We can use this data to find new music by counting the number of times an artist appeared across the second iteration of similar artists. Let’s see how things look when we pull in the full dataset, with each of the artist's top 20 most similar artists and each of their 20 most similar artists. The following visualization is based on the [Spotify Similiar Artists API](https://unboxed-analytics.com/data-technology/visualizing-rap-communities-wtih-python-spotifys-api/) article and created with flourish studio.
 
 
 <iframe src='https://flo.uri.sh/visualisation/12232729/embed' title='Interactive or visual content' class='flourish-embed-iframe' frameborder='0' scrolling='no' style='width:100%;height:600px;' sandbox='allow-same-origin allow-forms allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation'></iframe><div style='width:100%!;margin-top:4px!important;text-align:right!important;'><a class='flourish-credit' href='https://public.flourish.studio/visualisation/12232729/?utm_source=embed&utm_campaign=visualisation/12232729' target='_top' style='text-decoration:none!important'><img alt='Made with Flourish' src='https://public.flourish.studio/resources/made_with_flourish.svg' style='width:105px!important;height:16px!important;border:none!important;margin:0!important;'> </a></div>
 
 
 
--------------------------
+<!-- ------------------------- -->
 
 
 
-## Part 4. Organized Songs in a Playlist
+<!-- ## Part 4. Organized Songs in a Playlist -->
 
 
 ```{python}
@@ -460,7 +452,7 @@ kmeans.fit(X)
 ```
 
 
-```{python}
+```{python, eval=FALSE, include=FALSE}
 predictions = {}
 for p,n in zip(kmeans.predict(X),labels):
     if not predictions.get(p):
