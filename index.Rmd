@@ -8,6 +8,9 @@ output:
     toc: yes
     toc_float: yes
 knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "docs") })
+bibliography: assets/references.bib
+nocite: '@*'
+csl: assets/advanced-optical-materials.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -42,7 +45,7 @@ library(dplyr)
 
 
 
-<span class = "myhighlight">Objective.</span> Using Python, the project goal is to implement a k-means clustering algorithm, a technique often used in machine learning, and use it for data analysis. We write various functions making use of lists, sets, dictionaries, sorting, and graph data structures for computational problem solving and analysis.
+<span class = "myhighlight">Objective.</span> Using Python, the goal of this project is to implement the k-means clustering algorithm, a technique often used in machine learning, and use it for data analysis. We write various functions using lists, sets, dictionaries, sorting, and graph data structures for computational problem-solving and analysis.
 
 
 
@@ -63,53 +66,15 @@ library(dplyr)
 ## Part 1. Spotify API Data
 
 
+Spotify is a popular audio streaming platform with an extensive music database and global insights into music listening habits around the world. The Spotify API allows developers to access the platform's data, get user recommendations, create or modify playlists, and much more [@WebAPIReference2022]. Using the API requires an initial setup involving several steps. These steps include registering as a Spotify developer, creating an app, modifying the dashboard redirect URI, and storing the client ID and secret. After completing the initial steps for setup, we have access to the Spotify API and all its features. Such features include extracting audio feature information for a set of tracks identified by their unique IDs as explained below.
 
-
-
-
-[**Metadata.**](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-track)
-
-- `name`: The name of the track.
-- `album`: The name of the album on which the track appears.
-- `artist`: The name of the artist who performed the track.
-- `release_date`: The date the album was first released.
-- `length`: The track length in milliseconds.
-- `popularity`: The popularity of the track. Values are between 0 and 100. The popularity is calculated by an algorithm based on the total number of plays the track has had and how recent those plays are.
-
-
-[**Artists.**](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-an-artist)
-
-- `artist_pop`: The popularity of the artist. The value will be between 0 and 100, with 100 being the most popular. The artist's popularity is calculated from the popularity of all the artist's tracks.
-- `artist_genres`: A list of the genres the artist is associated with.
-
-
-[**Audio Features.** ](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features)
-
-- `acousticness`: A confidence measure from 0.0 to 1.0 of whether the track is acoustic.
-- `danceability`: Describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm, beat strength, and regularity.
-- `energy`: A measure from 0.0 to 1.0 that represents a perceptual measure of intensity and activity.
-- `instrumentalness`: Predicts whether a track contains no vocals. The closer the value is to 1.0, the more likely the track contains no vocal content.
-- `liveness`: Detects the presence of an audience in the recording. Higher values represent an increased probability that the track was performed live.
-- `loudness`: The overall loudness of a track in decibels (dB). Values are averaged across entire track, ranging between -60 and 0 db.
-- `speechiness`: Detects the presence of spoken words in a track. The more speech-like the recording, the closer to 1.0.
-- `tempo`: The overall estimated speed or pace of a track in beats per minute (BPM).
-- `valence`: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. High valence sound more positive (e.g. happy, cheerful, euphoric).
-- `key`: The key the track is in. If no key was detected, the value is -1.
-- `mode`: The modality (major or minor) of a track. Major is represented by 1 and minor is 0.
-- `time_signature`: An estimated time signature (how many beats are in each measure), ranging from 3 to 7 indicating time signatures of "3/4", to "7/4".
-
-
-
-
-
-----------------------------------------------
 
 
 
 ### Get Playlist Data from API
 
 
-First, we create a Client Credentials Flow Manager used in server-to-server authentication by passing the necessary parameters to the [Spotify OAuth](https://github.com/spotipy-dev/spotipy/blob/master/spotipy/oauth2.py#L261) class. We provide a client id and client secret to the constructor of this authorization flow, which does not require user interaction.
+First, we create a Client Credentials Flow Manager used in server-to-server authentication by passing the necessary parameters to the [Spotify OAuth](https://github.com/spotipy-dev/spotipy/blob/master/spotipy/oauth2.py#L261) class [@WelcomeSpotipySpotipy2022]. We provide a client id and client secret to the constructor of this authorization flow, which does not require user interaction.
 
 
 
@@ -140,12 +105,52 @@ for link in playlist_links:
 
 
 
-Then, we [write a function](https://github.com/hluebbering/playlist_report/blob/main/scripts/spotify_data.py) that takes the playlist data from the API and gets the audio features of each track. The following code loops through each track ID in the playlist and extracts the song information by calling the function we created. From there, we can create a dataframe by passing in the returned data and giving the column header names we want. 
+
+
+Then, we [write a function](https://github.com/hluebbering/playlist_report/blob/main/scripts/spotify_data.py) that takes the playlist data from the API and gets the metadata and audio characteristics of each track. Specifically, the function reads the query results for a playlist and returns the track name, track ID, artist, album, duration, popularity, artist popularity, artist genre, and audio characteristics for each track.
+
+
+
+
+- `name`: The name of the track.
+- `album`: The name of the album on which the track appears.
+- `artist`: The name of the artist who performed the track.
+- `release_date`: The date the album was first released.
+- `length`: The track length in milliseconds.
+- `popularity`: The popularity of the track calculated by an algorithm based on the total number of plays the track has had and how recent those plays are.
+- `artist_pop`: The popularity of the artist calculated from the popularity of all the artist's tracks.
+- `artist_genres`: A list of the genres the artist is associated with.
+
+
+
+#### Spotify Audio Features
+
+
+Spotify’s audio features are precalculated measures of both low-level and high-level perceptual music qualities that help classify a track. Some features are easy to interpret, whereas others are more compounded and complex measures. As indicated by the Spotify website, a quick explanation of each feature is shown below. More information on how to interpret these audio features is located at [Spotify’s API documentation](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features).
+
+
+
+- `acousticness`: A confidence measure from 0.0 to 1.0 of whether the track is acoustic.
+- `danceability`: Describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm, beat strength, and regularity.
+- `energy`: A measure from 0.0 to 1.0 that represents a perceptual measure of intensity and activity.
+- `instrumentalness`: Predicts whether a track contains no vocals. The closer the value is to 1.0, the more likely the track contains no vocal content.
+- `liveness`: Detects the presence of an audience in the recording. Higher values represent an increased probability that the track was performed live.
+- `loudness`: The overall loudness of a track in decibels (dB). Values are averaged across entire track, ranging between -60 and 0 db.
+- `speechiness`: Detects the presence of spoken words in a track. The more speech-like the recording, the closer to 1.0.
+- `tempo`: The overall estimated speed or pace of a track in beats per minute (BPM).
+- `valence`: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. High valence sound more positive (e.g. happy, cheerful, euphoric).
+
+
+
+
+
+
+The following code loops through each track ID in the playlist and extracts the song information by calling the function we created. From there, we can create a dataframe by passing in the returned data using the pandas package. 
 
 
 ```python
 # Loop over track ids
-all_tracks = [playlist_features(track_ids[i], artist_ids[i], playlist_ids[i])
+all_tracks = [playlist_features(track_ids[i], artist_ids[i], playlist_ids[i]) 
               for i in range(len(track_ids))]
 ```
 
@@ -153,9 +158,12 @@ all_tracks = [playlist_features(track_ids[i], artist_ids[i], playlist_ids[i])
 
 ```{r}
 df <- read.csv('scripts/data/my_playlist.csv')
+my_cols <- c('name','album','artist','release_date','length','popularity','artist_pop','artist_genres','acousticness','danceability','energy','instrumentalness','liveness','loudness','speechiness','tempo','valence')
+df <- dplyr::select(df, my_cols)
 
-kable(head(df,2)) %>%
-  kable_styling("striped", full_width = FALSE, font_size = 8, html_font = "Roboto")
+head(df, 3) %>% kable() %>% kable_styling("striped", font_size = 12) %>%
+  column_spec(c(1:16), width_max = "3cm") %>%
+  scroll_box(width = "100%")
 ```
 
 
@@ -168,12 +176,6 @@ reticulate::source_python('scripts/all_functions.py')
 
 
 
-```{python, echo=TRUE}
-# Number of rows and columns
-rows, cols = df.shape
-print(f'Number of songs: {rows}')
-print(f'Number of attributes per song: {cols}')
-```
 
 
 
@@ -183,16 +185,124 @@ print(f'Number of attributes per song: {cols}')
 -------------------------
 
 
-## Part 2. Track Similarity Search
+## Part 2. Similar Artists
+
+
+First, we want to find the most frequently occurring artist in a given playlist. We use the value_counts function to get a sequence containing counts of unique values sorted in descending order. 
+
+
+```{python, echo=TRUE}
+# Count distinct values in column
+tallyArtists = df.value_counts(["artist", "artist_id"]).reset_index(name='counts')
+topArtist = tallyArtists['artist_id'][1]
+```
+
+
+```{python}
+tallyArtists.head()
+```
+
+
+
+### Links
+
+I can retrieve artist and artist-related data using the following code, passing the artist ID to the artist and artist-related artist functions under the spotipy package. The returned list of similar artists is sorted by similarity score based on the listener data [@webbVisualizingRapCommunities2020].
+
+
+
+
+```{python, echo=TRUE}
+# create links table
+a = sp.artist(topArtist)
+ra = sp.artist_related_artists(topArtist)
+```
+
+
+
+
+
+```{python}
+# dictionary of lists 
+links_dict = {"source_name":[],"source_id":[],"target_name":[],"target_id":[]};
+for artist in ra['artists']:
+    links_dict["source_name"].append(a['name'])
+    links_dict["source_id"].append(a['id'])
+    links_dict["target_name"].append(artist['name'])
+    links_dict["target_id"].append(artist['id'])
+```
+
+
+
+
+We retrieve similar data for the nodes of the connection graph, creating a list that holds all of the artist source ids and target ids from the previous code. Here’s a sample of the result when we query Spotify for the artists most similar to the playlist's top artist, according to listener behavior.
+
+
+
+```{python}
+pd.DataFrame(links_dict).head()
+```
+
+\ 
+
+
+Let’s see how things look when we pull in the full dataset, with each of the artist's top most similar artists and each of their most similar artists. The following visualization is based on the [Spotify Similiar Artists API](https://unboxed-analytics.com/data-technology/visualizing-rap-communities-wtih-python-spotifys-api/) article and created with flourish studio.
+
+
+<iframe src='https://flo.uri.sh/visualisation/12232729/embed' title='Interactive or visual content' class='flourish-embed-iframe' frameborder='0' scrolling='no' style='width:100%;height:600px;' sandbox='allow-same-origin allow-forms allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation'></iframe><div style='width:100%!;margin-top:4px!important;text-align:right!important;'><a class='flourish-credit' href='https://public.flourish.studio/visualisation/12232729/?utm_source=embed&utm_campaign=visualisation/12232729' target='_top' style='text-decoration:none!important'><img alt='Made with Flourish' src='https://public.flourish.studio/resources/made_with_flourish.svg' style='width:105px!important;height:16px!important;border:none!important;margin:0!important;'> </a></div>
+
+<iframe src='https://flo.uri.sh/visualisation/12278724/embed' title='Interactive or visual content' class='flourish-embed-iframe' frameborder='0' scrolling='no' style='width:100%;height:500px;' sandbox='allow-same-origin allow-forms allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation'></iframe><div style='width:100%!;margin-top:4px!important;text-align:right!important;'><a class='flourish-credit' href='https://public.flourish.studio/visualisation/12278724/?utm_source=embed&utm_campaign=visualisation/12278724' target='_top' style='text-decoration:none!important'><img alt='Made with Flourish' src='https://public.flourish.studio/resources/made_with_flourish.svg' style='width:105px!important;height:16px!important;border:none!important;margin:0!important;'> </a></div>
+
+
+
+
+
+-------------------------
+
+
+
+## Part 3. Track Similarity Search
 
 
 
 <span class = "myhighlight">Objective.</span> Design and implement a k-means clustering algorithm in Python.
 
 
-Below, we create a query to retrieve similar elements based on the k-Nearest Neighbors (KNN) using the Euclidean distance. The KNN algorithm searches for $k$ similar elements based on a query point at the center within a predefined radius. In mathematics, the Euclidean distance between two points is the length of the line segment between the two points. In this sense, the closer the distance is to 0, the more similar the songs are.
+K-means clustering is a popular machine learning and data mining algorithm that discovers possible clusters within a dataset. Finding these clusters often reveals meaningful information from the data distribution. Below, we create a query to retrieve similar elements based on the k-Nearest Neighbors (KNN) using the Euclidean distance.
 
 
+
+### Definitions
+
+
+As with many machine learning techniques, this algorithm consists of a vast list of terminology which we define in a bit more detail below.
+
+
+<span class = "myhighlight2">Definition 1. Distance</span> The Euclidean distance, which indicates a straight line, is a simple way to calculate how close a data point is to a centroid using the Pythagorean theorem. For two points $a = \left[a_1, a_2, \ldots, a_n\right]$ and $b = \left[b_1, b_2, \ldots, b_n\right]$, where $n$ is the current dimension, we define the euclidean distance between both points as 
+
+
+$$
+\begin{align}
+\mathbf{\large\color{darkmagenta} D}(a, b) &= 
+\sqrt{\left(a_1 - b_1\right)^2 + 
+\left(a_2 - b_2\right)^2 + 
+\ldots + \left(a_n - b_n\right)^2}
+\end{align}
+$$
+
+
+<span class = "myhighlight2">Definition 2. Clusters</span> A cluster is a collection of points that are part of the same group. For k-means, every point is part of a cluster. So as the algorithm progresses and the centroids shift, points might change which cluster they're grouped in, even though the point itself does not move. 
+
+<span class = "myhighlight2">Definition 3. Centroids</span> A centroid is the center of a cluster. In K-means, we assume that the centroid of a cluster is the average location of all the points in that cluster. This is equivalent to the average of the data points' components in each dimension. So if we have three $n$-dimensional points $a$, $b$, and $c$, we define the average as
+
+
+$$
+\mathit{average} = 
+\left[
+\dfrac{a_1 + b_1 + c_1}{3}, \dfrac{a_2 + b_2 + c_2}{3}, \dfrac{a_3 + b_3 + c_3}{3}
+\right]
+$$
+
+<span class = "myhighlight2">Definition 4. Convergence</span> An algorithm converges if the locations of all centroids do not change much between two iterations, e.g. within some threshold of $1 \times 10^{-5}$.
 
 
 
@@ -202,7 +312,7 @@ Below, we create a query to retrieve similar elements based on the k-Nearest Nei
 
 
 
-K-means clustering is a popular machine learning and data mining algorithm that discovers possible clusters within a dataset. Finding these clusters often reveals meaningful information from the data distribution. K-means clustering is used for a number of different applications, such as recognizing hand-written digits, which we will be implementing in this assignment.
+The KNN algorithm [@leonardomauroSpotifySongsSimilarity2020] searches for $k$ similar elements based on a query point at the center within a predefined radius. In mathematics, the Euclidean distance between two points is the length of the line segment between the two points. In this sense, the closer the distance is to 0, the more similar the songs are.
 
 
 
@@ -221,52 +331,28 @@ Note that the actual data points do not change. Only the locations of the centro
 
 
 
-#### Definitions
+```python
+# k-Nearest Neighbors (KNN)
+def knnQuery(queryPoint, arrCharactPoints, k):
+    distVals = []
+    queryVals = queryPoint.tolist()
+    tmp = arrCharactPoints.copy(deep = True) # Copy data
+    for index, row in tmp.iterrows():
+        feat = row.values.tolist()
+        # Calculate sum of squared differences
+        ssd = sum(abs(feat[i] - queryVals[i]) ** 2 for i in range(len(queryVals)))
+        distVals.append(ssd ** 0.5) # Euclidean distance
+    tmp['distance'] = distVals.sort_values()
+    # K closest and furthest points
+    return tmp.head(k).index, tmp.tail(k).index
 
-
-As with many machine learning techniques, this algorithm consists of a vast list of terminology which we define in a bit more detail below.
-
-<div class = "datasource2">
-
-<span class = "myhighlight2">Definition 1. Distance</span> The Euclidean distance, which indicates a straight line, is a simple way to calculate how close a data point is to a centroid. We calculate the euclidean distance using the **Pythagorean theorem**, defined as follows. For two points $a = \left[a_1, a_2, \ldots, a_n\right]$ and $b = \left[b_1, b_2, \ldots, b_n\right]$, where $n$ is the current dimension, we define the euclidean distance between both points as 
-
-
-$$
-\begin{align}
-\mathbf{\large\color{darkmagenta} D}(a, b) &= 
-\sqrt{\left(a_1 - b_1\right)^2 + 
-\left(a_2 - b_2\right)^2 + 
-\ldots + \left(a_n - b_n\right)^2}
-\end{align}
-$$
-
-
-
-
-<span class = "myhighlight2">Definition 2. Clusters</span> A cluster is a collection of points that are part of the same group. For k-means, every point is part of a cluster. So as the algorithm progresses and the centroids shift, points might change which cluster they're grouped in, even though the point itself does not move. 
-
-
-
-
-<span class = "myhighlight2">Definition 3. Centroids</span> A centroid is the center of a cluster. In K-means, we assume that the centroid of a cluster is the average location of all the points in that cluster. This is equivalent to the average of the data points' components in each dimension. So if we have three $n$-dimensional points $a$, $b$, and $c$, we define the average as
-
-
-$$
-\mathit{average} = 
-\left[
-\dfrac{a_1 + b_1 + c_1}{3}, \dfrac{a_2 + b_2 + c_2}{3}, \dfrac{a_3 + b_3 + c_3}{3}
-\right]
-$$
-
-
-
-<span class = "myhighlight2">Definition 4. Convergence</span> An algorithm converges if the locations of all centroids do not change much between two iterations, e.g. within some threshold of $1 \times 10^{-5}$.
-
-
-
-
-</div>
-
+# Execute KNN removing the query point
+def querySimilars(df, columns, idx, func, param):
+    arr = df[columns].copy(deep = True)
+    queryPoint = arr.loc[idx]
+    arr = arr.drop([idx])
+    return func(queryPoint, arr, param)
+```
 
 
 
@@ -361,67 +447,6 @@ for track_name, track_count in nonsimilar.items():
 
 
 
-
-## Part 3. Similar Artists Web Visual
-
-
-First, we want to find the most frequently occurring artist in a given playlist. We use the value_counts function to get a sequence containing counts of unique values sorted in descending order. 
-
-
-```{python, echo=TRUE}
-# Count distinct values in column
-tallyArtists = df.value_counts(["artist", "artist_id"]).reset_index(name='counts')
-topArtist = tallyArtists['artist_id'][1]
-```
-
-
-```{python}
-tallyArtists.head()
-```
-
-
-
-### Links
-
-I can retrieve artist and artist-related data using the following code, passing the artist ID to the artist and artist-related artist functions under the spotipy package. The returned list of similar artists is sorted by similarity score based on the listener data.
-
-
-```{python, echo=TRUE}
-# create links table
-a = sp.artist(topArtist)
-ra = sp.artist_related_artists(topArtist)
-```
-
-
-
-```{python}
-# dictionary of lists 
-links_dict = {"source_name":[],"source_id":[],"target_name":[],"target_id":[]};
-for artist in ra['artists']:
-    links_dict["source_name"].append(a['name'])
-    links_dict["source_id"].append(a['id'])
-    links_dict["target_name"].append(artist['name'])
-    links_dict["target_id"].append(artist['id'])
-```
-
-
-
-
-We retrieve similar data for the nodes of the connection graph, creating a list that holds all of the artist source ids and target ids from the previous code. Here’s a sample of the result when we query Spotify for the artists most similar to Post Malone, according to listener behavior.
-
-
-
-```{python}
-pd.DataFrame(links_dict).head()
-```
-
-\ 
-
-
-We can use this data to find new music by counting the number of times an artist appeared across the second iteration of similar artists. Let’s see how things look when we pull in the full dataset, with each of the artist's top 20 most similar artists and each of their 20 most similar artists. The following visualization is based on the [Spotify Similiar Artists API](https://unboxed-analytics.com/data-technology/visualizing-rap-communities-wtih-python-spotifys-api/) article and created with flourish studio.
-
-
-<iframe src='https://flo.uri.sh/visualisation/12232729/embed' title='Interactive or visual content' class='flourish-embed-iframe' frameborder='0' scrolling='no' style='width:100%;height:600px;' sandbox='allow-same-origin allow-forms allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation'></iframe><div style='width:100%!;margin-top:4px!important;text-align:right!important;'><a class='flourish-credit' href='https://public.flourish.studio/visualisation/12232729/?utm_source=embed&utm_campaign=visualisation/12232729' target='_top' style='text-decoration:none!important'><img alt='Made with Flourish' src='https://public.flourish.studio/resources/made_with_flourish.svg' style='width:105px!important;height:16px!important;border:none!important;margin:0!important;'> </a></div>
 
 
 
