@@ -15,8 +15,8 @@ library(tidyverse)
 ###################################################
 
 # Spotify authorization tokens
-Sys.setenv(SPOTIFY_CLIENT_ID = "4cf3afdca2d74dc48af9999b1b7c9c61")
-Sys.setenv(SPOTIFY_CLIENT_SECRET = "f6ca08ad37bb41a0afab5ca1dc74b208")
+Sys.setenv(SPOTIFY_CLIENT_ID = "xxx")
+Sys.setenv(SPOTIFY_CLIENT_SECRET = "xxx")
 spotifyr::get_spotify_authorization_code()
 
 
