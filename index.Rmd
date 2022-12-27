@@ -130,14 +130,14 @@ Spotify’s audio features are precalculated measures of both low-level and high
 
 
 - `acousticness`: A confidence measure of whether the track is acoustic.
-- `danceability`: Describes how suitable a track is for dancing based on tempo, rhythm, beat strength, and regularity.
+- `danceability`: Suitability for dancing based on tempo, rhythm, beat, and regularity.
 - `energy`: A perceptual measure of intensity and activity.
 - `instrumentalness`: Predicts whether a track contains no vocals.
 - `liveness`: Probability that the track was performed live.
 - `loudness`: Overall loudness of a track in decibels (dB).
 - `speechiness`: Detects the presence of spoken words in a track.
 - `tempo`: Estimated pace of a track in beats per minute (BPM).
-- `valence`: A measure describing the musical positiveness. High valence sound more positive (e.g. happy, cheerful, euphoric).
+- `valence`: A measure describing the musical positiveness.
 
 
 
@@ -172,6 +172,7 @@ head(df, 2) %>% kable() %>% kable_styling() %>%
 library(reticulate)
 reticulate::source_python('scripts/all_functions.py')
 ```
+
 
 
 
@@ -311,7 +312,7 @@ $$
 
 
 
-The KNN algorithm [@leonardomauroSpotifySongsSimilarity2020] searches for $k$ similar elements based on a query point at the center within a predefined radius. In mathematics, the Euclidean distance between two points is the length of the line segment between the two points. In this sense, the closer the distance is to 0, the more similar the songs are.
+The KNN algorithm [@leonardomauroSpotifySongsSimilarity2020] searches for $k$ similar elements based on a query point at the center within a predefined radius. The Euclidean distance between two points is the length of the line segment between the two points. In this sense, the closer the distance is to 0, the more similar the songs are.
 
 
 
@@ -417,64 +418,104 @@ for track_name, track_count in nonsimilar.items():
 ## Part 4. K Means Clustering
 
 
+Next, we implement the K-Means clustering algorithm using the Scikit-Learn library to break down a playlist into several smaller playlists. The unsupervised learning algorithm divides similar data points into k groups by computing the distance to the centroid. 
 
 
-Next, we implement K-Means clustering using the Scikit-Learn library to break a large playlist into several smaller playlists. The first step is to define the K-Means function with k=3 clusters.
+The first step is to define an appropriate predefined number (k) of clusters. We use the Elbow Method to determine the optimal k, as shown below [@chingisoinarSeparateYourSaved2020].
+
+
+```{python}
+my_df = pd.read_csv('scripts/data/my_playlist.csv', encoding_errors='ignore', index_col=0, header=0)
+X = my_df[['acousticness', 'danceability', 'liveness', 'energy','valence', 'instrumentalness', 'speechiness']]
+features = X.values
+
+from sklearn.cluster import KMeans
+ssd = [] # Sum of squared distances
+for k in range(1,11):
+    model = KMeans(n_clusters = k, init="k-means++")
+    model = model.fit(features)
+    ssd.append(model.inertia_)
+```
+
+
+
+
+```{r,out.width="90%"}
+elbowdf <- data.frame("ssd" = py$ssd,"x" = c(1:10))
+elbow_plot <- ggplot(data = elbowdf, mapping = aes(x=x,y=ssd**2)) +
+  geom_point(fill="#61cad1",pch = 21, size = 3.25, alpha = 0.9, color = "#030404", stroke = 0.5) + geom_line() +
+  theme_ipsum_rc(axis_text_size = 10) +
+  xlab("# clusters") + scale_x_continuous(n.breaks = 10) +
+  ylab("sum of squared distances") + scale_y_continuous(n.breaks = 10)
+
+
+
+ragg::agg_png(filename = "assets/static/elbow_plot.png", width = 7085, height = 4295, units = "px", res = 900)
+elbow_plot
+invisible(dev.off())
+knitr::include_graphics("assets/static/elbow_plot.png")
+```
+
+
+Thus, we tune the clustering algorithm by running K-Means for a range of k values, obtaining the above figure. It looks like a value of 3 is optimal for this case. Next, we call the K-Means function and set the k value to 3 clusters.
+
+
+
 
 
 ```{python, echo=TRUE}
 from sklearn.cluster import KMeans
-kmeans = KMeans(n_clusters = 3)
-kmeans.fit(df[columns])
-df['group'] = list(kmeans.labels_)
+model = KMeans(n_clusters = 3)
+model = model.fit(features)
+my_df['cluster'] = list(model.labels_)
 ```
+
+
+
 
 
 ```{python}
 import seaborn as sns
-sns.countplot([str(group) for group in kmeans.labels_], color = 'lightblue')
-```
-
-
-To further explore the data and decompose the audio features into a set of variables easier to visualize, we implement principal component analysis (PCA). We first scale the data as follows.
-
-
-```{python, echo=TRUE}
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-scaler.fit(df[columns])
-scaled_data = scaler.transform(df[columns])
+sns.countplot([str(group) for group in model.labels_], color = 'lightblue')
 ```
 
 
 
-We then use a PCA instance that looks for two principal components determined from the data variables. From there, we visualize the two principal components and explore the variation.
+
+Considering that there are seven different audio features for the clustering task, we use principal component analysis (PCA) to reduce the dimensionality of the data into a more easily visualized set of variables. 
+
 
 
 ```{python, echo=TRUE}
 from sklearn.decomposition import PCA
-pca = PCA(n_components=2)
-pca.fit(scaled_data)
-data_pca = pca.transform(scaled_data)
+pca = PCA(n_components = 2)
+pca_result = pca.fit_transform(features)
 ```
 
 
 
-```{r,echo=FALSE,eval=TRUE}
-x <- py$data_pca
-lss = c()
-for (i in py$kmeans$labels_) {
-  lss = append(x = lss, values = glue::glue("Group ", i))}
-pcadf <- data.frame("x1" = x[,1], "x2" = x[,2], "labels"=lss)
+In the above code, we define a PCA instance to find two principal components determined from the features of the data. From there, we visualize the resulting clusters and explore the variation. The figure below shows our 3 clusters represented in 2-dimensional space.
 
-data_points_plot <- ggplot(data = pcadf, mapping = aes(x = x1, y = x2, label = labels)) +
-  geom_point(mapping = aes(fill = labels), pch = 21, size = 3.25, alpha = 0.9, color = "#030404", stroke = 0.5) +
+
+
+
+```{r,echo=FALSE,eval=TRUE}
+cluster_labels = c()
+for (i in py$model$labels_) {
+  cluster_labels = append(x = cluster_labels, values = glue::glue("Group ", i))}
+x <- py$pca_result
+pcadf <- data.frame("x1" = x[,1], "x2" = x[,2], "labels"=cluster_labels)
+
+
+data_points_plot <- ggplot(data = pcadf, mapping = aes(x = x1, y = x2, label = cluster_labels)) +
+  geom_point(mapping = aes(fill = cluster_labels), pch = 21, size = 3.85, alpha = 0.85, color = "#030404", stroke = 0.65) +
   scale_fill_manual(values = c(
     "black", "#61cad1", "#cae278", "#ff99b1",
     "#F0BE43", "#c757c7", "#ff5370")) +
   theme_ipsum_rc(axis_text_size = 10) +
   xlab(glue::glue("PCA ", round(py$pca$explained_variance_ratio_[1],digits = 5))) +
   ylab(glue::glue("PCA ", round(py$pca$explained_variance_ratio_[2],digits = 5)))
+
 
 ragg::agg_png(filename = "assets/static/data_points_plot.png", width = 7085, height = 4295, units = "px", res = 900)
 data_points_plot
@@ -487,15 +528,23 @@ knitr::include_graphics("assets/static/data_points_plot.png")
 
 
 
-```{python}
-df2 = df[['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'speechiness', 'valence','group']]
-df2 = df2.astype({'group': str})
 
-means = pd.DataFrame(index = range(0,3), columns = list(df2[df2['group'] == '0'].describe().loc['mean'].index))
-means.iloc[0] = df2[df2['group'] == '0'].describe().loc['mean']
-means.iloc[1] = df2[df2['group'] == '1'].describe().loc['mean']
-means.iloc[2] = df2[df2['group'] == '2'].describe().loc['mean']
+
+
+
+```{python}
+my_df = my_df[['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'speechiness', 'valence','cluster']]
+my_df = my_df.astype({'cluster': str})
+
+means = pd.DataFrame(index = range(0,3), columns = list(my_df[my_df['cluster'] == '0'].describe().loc['mean'].index))
+
+means.iloc[0] = my_df[my_df['cluster'] == '0'].describe().loc['mean']
+means.iloc[1] = my_df[my_df['cluster'] == '1'].describe().loc['mean']
+means.iloc[2] = my_df[my_df['cluster'] == '2'].describe().loc['mean']
+
 ```
+
+
 
 
 
@@ -506,10 +555,10 @@ py$means %>% kable(row.names = 1:nrow(py$means)) %>%
 
 
 
-
-
-
-
+- Cluster 1 has the highest energy and valence, indicating that these tracks are faster-paced, louder, and more positive (e.g., happy, cheerful, euphoric) than the other clusters. 
+- Cluster 2 has the highest acousticness, with a mean value of 0.5396875 over all the cluster's songs. Cluster 2 is also higher in danceability, indicating tracks with a faster tempo and beat intensity. 
+- Cluster 3 appears to be the lowest valence, with a mean of 0.2303227, indicating more negative trajectories (e.g., sadness, frustration, anger). 
+- All the clusters have values below 0.33, indicating that the songs most likely represent music and other non-speech-like tracks.
 
 
 
