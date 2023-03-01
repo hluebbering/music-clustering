@@ -14,7 +14,7 @@ csl: assets/advanced-optical-materials.csl
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, out.width = "80%")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, out.width = "98%")
 library(kableExtra)
 library(knitr)
 library(ggplot2)
@@ -52,6 +52,12 @@ library(dplyr)
 
 
 
+```{r echo=FALSE}
+htmltools::includeHTML(path = 'assets/covers.html')
+```
+
+
+
 
 
 
@@ -66,7 +72,7 @@ library(dplyr)
 ## Part 1. Spotify API Data
 
 
-Spotify is a popular audio streaming platform with an extensive music database. The Spotify API allows developers to access the platform's data providing global insights into music listening habits around the world [@WebAPIReference2022]. Using the API requires an initial setup involving several steps. These steps include registering as a Spotify developer, creating an app, modifying the dashboard redirect URI, and storing the client ID and secret. After completing the initial steps for setup, we have access to the Spotify API and all its features. 
+Spotify is a popular audio streaming platform with an extensive music database. The Spotify API allows developers to access the platform's data providing global insights into music listening habits [@WebAPIReference2022]. Using the API requires an initial setup: we must register as a Spotify developer, create an app, modify the dashboard redirect URI, and store the client ID and secret. After completing these steps, we have access to the Spotify API and all its features. 
 
 
 
@@ -84,8 +90,8 @@ client_id = 'xxx'
 client_secret = 'xxx'
 
 # Spotify authentication
-client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
-sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
+cc_manager = SpotifyClientCredentials(client_id, client_secret)
+sp = spotipy.Spotify(client_credentials_manager = cc_manager)
 ```
 
 
@@ -93,12 +99,11 @@ Now we can get the full details of the tracks of a playlist based on a playlist 
 
 
 ```python
-for link in playlist_links:
-    playlist_URI = link.split("/")[-1].split("?")[0]
-    # Iterate over list of tracks in playlist
-    for i in sp.playlist_tracks(playlist_URI)["items"]:   
-        track_ids.append(i['track']["id"]) # Extract song id
-        artist_ids.append(i['track']["artists"][0]["uri"]) # Extract artist id
+playlist_URI = playlist_link.split("/")[-1].split("?")[0]
+# Iterate over list of playlist tracks
+for i in sp.playlist_tracks(playlist_URI)["items"]:
+    track_ids.append(i["track"]["id"])  # Extract song id
+    artist_ids.append(i["track"]["artists"][0]["uri"])  # Extract artist id
 ```
 
 
@@ -111,22 +116,29 @@ Then, we [write a function](https://github.com/hluebbering/playlist_report/blob/
 
 
 
-- `name`: The name of the track.
-- `album`: The name of the album on which the track appears.
-- `artist`: The name of the artist who performed the track.
-- `release_date`: The date the album was first released.
-- `length`: The track length in milliseconds.
-- `popularity`: The popularity of the track calculated by an algorithm based on the total number of plays the track has had and how recent those plays are.
-- `artist_pop`: The popularity of the artist calculated from the popularity of all the artist's tracks.
-- `artist_genres`: A list of the genres the artist is associated with.
 
 
 
-#### Spotify Audio Features
 
 
-Spotify’s audio features are precalculated measures of both low-level and high-level perceptual music qualities that help classify a track. As indicated by the Spotify website, a quick explanation of each feature is shown below. More information on how to interpret these audio features is located at [Spotify’s API documentation](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features).
 
+
+#### Spotify Audio Features {.tabset .tabset-fade .tabset-pills}
+***
+Spotify’s audio features are precalculated measures of both low-level and high-level perceptual music qualities that help classify a track. A quick explanation of each feature is shown below. More information on how to interpret these audio features is located at [Spotify’s API documentation](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features).
+
+
+
+##### Track Metadata
+
+
+
+```{r echo=FALSE}
+htmltools::includeHTML(path = 'assets/lists1.html')
+```
+
+
+##### Audio Features
 
 
 - `acousticness`: A confidence measure of whether the track is acoustic.
@@ -143,14 +155,19 @@ Spotify’s audio features are precalculated measures of both low-level and high
 
 
 
+----
+
+
+### Playlist Data Preview
+
 
 The following code loops through each track ID in the playlist and extracts the song information by calling the function we created. From there, we can create a dataframe by passing in the returned data using the pandas package. 
 
 
 ```python
 # Loop over track ids
-all_tracks = [playlist_features(track_ids[i], artist_ids[i], playlist_ids[i]) 
-              for i in range(len(track_ids))]
+tracks = [playlist_features(track_ids[i], artist_ids[i], playlist_ids[i])
+    for i in range(len(track_ids))]
 ```
 
 
@@ -160,20 +177,83 @@ df <- read.csv('scripts/data/my_playlist.csv')
 my_cols <- c('name','album','artist','release_date','length','popularity','artist_pop','artist_genres','acousticness','danceability','energy','instrumentalness','liveness','loudness','speechiness','tempo','valence')
 df <- dplyr::select(df, my_cols)
 
-head(df, 2) %>% kable() %>% kable_styling() %>%
-  column_spec(c(1:16), width_max = "3cm") %>%
-  scroll_box(width = "100%")
+library(DT)
+datatable(head(df, 10), rownames = FALSE, options = list(scrollX=T, pageLength=2))
 ```
+
+
+
+
+
+
 
 
 
 
 ```{r}
 library(reticulate)
-reticulate::source_python('scripts/all_functions.py')
+
 ```
 
 
+
+```{python}
+import csv
+import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from operator import index
+
+# Set client id and client secret
+client_id = '4cf3afdca2d74dc48af9999b1b7c9c61'
+client_secret = 'f6ca08ad37bb41a0afab5ca1dc74b208'
+# Spotify authentication token
+client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
+sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
+
+# Read csv file into pandas dataframe
+df = pd.read_csv("scripts/data/my_playlist.csv", encoding_errors="ignore", index_col=0, header=0)
+
+
+# Get a song string search
+def getMusicName(elem):
+    return f"{elem['artist']} - {elem['name']}"
+
+
+# K-nearest neighbors algorithm
+def knnQuery(queryPoint, arrCharactPoints, k):
+    queryVals = queryPoint.tolist()
+    distVals = []
+
+    # Copy of dataframe indices and data
+    tmp = arrCharactPoints.copy(deep=True)
+    for index, row in tmp.iterrows():
+        feat = row.values.tolist()
+
+        # Calculate sum of squared differences
+        ssd = sum(abs(feat[i] - queryVals[i]) ** 2 for i in range(len(queryVals)))
+
+        # Get euclidean distance
+        distVals.append(ssd**0.5)
+
+    tmp["distance"] = distVals
+    tmp = tmp.sort_values("distance")
+
+    # K closest and furthest points
+    return tmp.head(k).index, tmp.tail(k).index
+
+
+# Execute KNN removing the query point
+def querySimilars(df, columns, idx, func, param):
+    arr = df[columns].copy(deep=True)
+    queryPoint = arr.loc[idx]
+    arr = arr.drop([idx])
+    return func(queryPoint, arr, param)
+
+```
 
 
 
@@ -199,9 +279,48 @@ topArtist = tallyArtists['artist_id'][1]
 ```
 
 
-```{r}
-py$tallyArtists %>% head(3) %>% kable() %>% kable_styling()
+
+```{python}
+df['year'] = pd.DatetimeIndex(df['release_date']).year
+tallyYears = df.value_counts(["year"]).reset_index(name='counts')
+tallyPop = df.value_counts(["popularity"]).reset_index(name='counts')
 ```
+
+
+
+      
+```{r}
+
+my_pop <- py$tallyPop
+my_pop_plot <- ggplot(data = my_pop, mapping = aes(x = popularity, y = counts)) + 
+  geom_smooth(alpha=0.95, fill="#eeeeee", color="#ff99b1") +
+  geom_col(fill="#eeeeee", alpha=0.75, color = "#a9a9a9", stroke=0.1) + theme_ipsum_rc(axis_text_size = 11, plot_margin = ggplot2::margin(t = 0,l = 0,b = 2,r = 40),plot_title_size = 13) + ylab("popularity") + xlab("# of songs") + ggtitle('Plot 1. Popularity Distribution')
+
+my_years <- py$tallyYears
+years_plot <- ggplot(data = my_years, mapping = aes(x = year, y = counts)) +
+  geom_col(alpha=0.95,fill="#eeeeee",color="#a9a9a9", stroke=0.25) +
+  geom_smooth(alpha=0.5, color="#030404", fill="#f59b23") + 
+  theme_ipsum_rc(axis_text_size = 11, plot_margin = ggplot2::margin(t = 0,r = 0,b = 2,l = 40),plot_title_size = 13) + ylab("# of songs") + xlab("year") + ggtitle('Plot 2. Track Release Date Distribution')
+
+my_artists <- py$tallyArtists %>% head(8)
+artists_plot <- ggplot(data = my_artists, mapping = aes(y = artist, x = counts)) +
+  geom_col(fill="#fc65a2", alpha = 0.9, color = "#030404", stroke = 0.5) + theme_ipsum_rc(axis_text_size = 11,plot_margin = ggplot2::margin(t=20,0,0,0),plot_title_size = 13) + ylab(NULL) + xlab("# of songs") + ggtitle('Plot 3. Artist Distribution (Top 8)')
+```
+
+
+
+```{r}
+library(patchwork)
+
+ragg::agg_png(filename = "assets/static/mypatchwork1.png", width = 9285, height = 5695, units = "px", res = 900)
+(my_pop_plot | years_plot) / artists_plot
+invisible(dev.off())
+knitr::include_graphics("assets/static/mypatchwork1.png")
+```
+
+
+
+
 
 
 
@@ -236,8 +355,14 @@ Below is a sample of the result when we query Spotify for the most similar artis
 
 
 
+
 ```{r}
-py$links_dict %>% data.frame() %>% head(3) %>% kable() %>% kable_styling()
+library(DT)
+datatable(py$links_dict%>% data.frame() %>% head(10), rownames = FALSE, options = list(pageLength = 3, scrollX=T) )
+
+
+# py$links_dict %>% data.frame() %>% head(3) %>% kable() %>% kable_styling() %>%
+#   scroll_box(width = "100%")
 ```
 
 
@@ -262,21 +387,23 @@ Let’s see how things look when we pull in the full dataset, with each of the a
 
 
 
-<span class = "myhighlight">Objective.</span> Design and implement a k-means clustering algorithm in Python.
+<span class = "myhighlight3">Objective.</span> Design and implement a k-means clustering algorithm in Python.
 
 
 K-means clustering is a popular machine learning and data mining algorithm that discovers possible clusters within a dataset. Finding these clusters often reveals meaningful information from the data distribution. Below, we create a query to retrieve similar elements based on the k-Nearest Neighbors (KNN) using the Euclidean distance.
 
 
 
-### Definitions
 
 
+### Definitions {.tabset .tabset-fade .tabset-pills}
+***
 As with many machine learning techniques, this algorithm consists of a vast list of terminology which we define in a bit more detail below.
 
+#### Definition 1.
 
-<span class = "myhighlight2">Definition 1. Distance</span> The Euclidean distance, which indicates a straight line, is a simple way to calculate how close a data point is to a centroid using the Pythagorean theorem. For two points $a = \left[a_1, a_2, \ldots, a_n\right]$ and $b = \left[b_1, b_2, \ldots, b_n\right]$, where $n$ is the current dimension, we define the euclidean distance between both points as 
-
+<div class = "deff">
+<span class = "myhighlight4">Definition 1. Distance</span> The Euclidean distance is a way to calculate how close a data point is to a centroid using the Pythagorean theorem. For two points $a = \left[a_1, a_2, \ldots, a_n\right]$ and $b = \left[b_1, b_2, \ldots, b_n\right]$ with dimension $n$, we define the euclidean distance between both points as 
 
 $$
 \small
@@ -288,11 +415,22 @@ $$
 \end{align}
 $$
 
+</div>
 
-<span class = "myhighlight2">Definition 2. Clusters</span> A cluster is a collection of points that are part of the same group. For k-means, every point is part of a cluster. So as the algorithm progresses and the centroids shift, points might change which cluster they're grouped in, even though the point itself does not move. 
 
-<span class = "myhighlight2">Definition 3. Centroids</span> A centroid is the center of a cluster calculated by the average location of all the cluster points. This is equivalent to the average of the data points' components in each dimension. So if we have three $n$-dimensional points $a$, $b$, and $c$, we define the average as
 
+
+#### Definition 2.
+
+<div class = "deff">
+<span class = "myhighlight4">Definition 2. Clusters</span> A cluster is a collection of grouped points. For k-means, every point is part of a cluster. As the algorithm progresses and the centroids shift, points might change which cluster they're grouped in, though the point itself does not move. 
+</div>
+
+
+#### Definition 3.
+
+<div class = "deff">
+<span class = "myhighlight4">Definition 3. Centroids</span> A centroid is the center of a cluster calculated by the average location of all the cluster points in each dimension. So if we have three $n$-dimensional points $a$, $b$, and $c$, we define the average as
 
 $$
 \small
@@ -302,7 +440,19 @@ $$
 \right]
 $$
 
-<span class = "myhighlight2">Definition 4. Convergence</span> An algorithm converges if the locations of all centroids do not change much between two iterations, e.g. within some threshold of $1 \times 10^{-5}$.
+</div>
+
+
+
+#### Definition 4.
+
+<div class = "deff">
+<span class = "myhighlight4">Definition 4. Convergence</span> An algorithm converges if the locations of all centroids do not change much between two iterations, e.g. within some threshold of $1 \times 10^{-5}$.
+</div>
+
+
+-------------------
+
 
 
 
@@ -369,9 +519,13 @@ for track_index in response[1]:
 
 
 
+#### KNN Query Example (Extended) {.tabset .tabset-fade .tabset-pills}
+***
 The code below implements the same idea as above, but queries each track in a given playlist instead of a single defined query point.
 
 
+
+##### Code 
 
 
 ```{python, echo=TRUE}
@@ -395,17 +549,32 @@ for track_index in df.index:
 
 
 
+##### Non-Similar Songs Count
+
+
+
 ```{python}
 nonsimilar = dict(sorted(nonsimilar_count.items(), key=lambda item: item[1], reverse=True))
 
 print('---- NON-SIMILAR SONGS COUNT ----')
 for track_name, track_count in nonsimilar.items():
-    if track_count >= 8:
+    if track_count >= 10:
         print(track_name, ':', track_count)
 ```
 
 
+##### Similar Songs Count
 
+
+
+```{python}
+similar = dict(sorted(similar_count.items(), key=lambda item: item[1], reverse=True))
+
+print('---- SIMILAR SONGS COUNT ----')
+for track_name, track_count in similar.items():
+    if track_count >= 2:
+        print(track_name, ':', track_count)
+```
 
 
 
@@ -424,14 +593,28 @@ Next, we implement the K-Means clustering algorithm using the Scikit-Learn libra
 The first step is to define an appropriate predefined number (k) of clusters. We use the Elbow Method to determine the optimal k, as shown below [@chingisoinarSeparateYourSaved2020].
 
 
-```{python}
+```{python,include=FALSE}
 my_df = pd.read_csv('scripts/data/my_playlist.csv', encoding_errors='ignore', index_col=0, header=0)
 X = my_df[['acousticness', 'danceability', 'liveness', 'energy','valence', 'instrumentalness', 'speechiness']]
 features = X.values
 
 from sklearn.cluster import KMeans
 ssd = [] # Sum of squared distances
-for k in range(1,11):
+for k in range(1,12):
+    model = KMeans(n_clusters = k, init="k-means++")
+    model = model.fit(features)
+    ssd.append(model.inertia_)
+```
+
+
+
+```{python, echo=TRUE, eval=FALSE}
+X = df[['acousticness', 'danceability', 'liveness', 'energy','valence', 'instrumentalness', 'speechiness']]
+features = X.values
+
+from sklearn.cluster import KMeans
+ssd = [] # Sum of squared distances
+for k in range(1,12):
     model = KMeans(n_clusters = k, init="k-means++")
     model = model.fit(features)
     ssd.append(model.inertia_)
@@ -440,10 +623,11 @@ for k in range(1,11):
 
 
 
-```{r,out.width="90%"}
-elbowdf <- data.frame("ssd" = py$ssd,"x" = c(1:10))
+
+```{r,out.width="80%"}
+elbowdf <- data.frame("ssd" = py$ssd,"x" = c(1:11))
 elbow_plot <- ggplot(data = elbowdf, mapping = aes(x=x,y=ssd**2)) +
-  geom_point(fill="#61cad1",pch = 21, size = 3.25, alpha = 0.9, color = "#030404", stroke = 0.5) + geom_line() +
+  geom_point(fill="#f859ca",pch = 21, size = 3.25, alpha = 0.9, color = "#030404", stroke = 0.5) + geom_line() +
   theme_ipsum_rc(axis_text_size = 10) +
   xlab("# clusters") + scale_x_continuous(n.breaks = 10) +
   ylab("sum of squared distances") + scale_y_continuous(n.breaks = 10)
@@ -463,9 +647,9 @@ Thus, we tune the clustering algorithm by running K-Means for a range of k value
 
 
 
-```{python, echo=TRUE}
+```{python, include=FALSE}
 from sklearn.cluster import KMeans
-model = KMeans(n_clusters = 3)
+model = KMeans(n_clusters = 3, init="k-means++")
 model = model.fit(features)
 my_df['cluster'] = list(model.labels_)
 ```
@@ -474,10 +658,8 @@ my_df['cluster'] = list(model.labels_)
 
 
 
-```{python}
-import seaborn as sns
-sns.countplot([str(group) for group in model.labels_], color = 'lightblue')
-```
+
+
 
 
 
@@ -510,8 +692,8 @@ pcadf <- data.frame("x1" = x[,1], "x2" = x[,2], "labels"=cluster_labels)
 data_points_plot <- ggplot(data = pcadf, mapping = aes(x = x1, y = x2, label = cluster_labels)) +
   geom_point(mapping = aes(fill = cluster_labels), pch = 21, size = 3.85, alpha = 0.85, color = "#030404", stroke = 0.65) +
   scale_fill_manual(values = c(
-    "black", "#61cad1", "#cae278", "#ff99b1",
-    "#F0BE43", "#c757c7", "#ff5370")) +
+    "black", "#cae278", "#ff99b1",
+    "#F0BE43", "#c757c7", "#f859ca")) +
   theme_ipsum_rc(axis_text_size = 10) +
   xlab(glue::glue("PCA ", round(py$pca$explained_variance_ratio_[1],digits = 5))) +
   ylab(glue::glue("PCA ", round(py$pca$explained_variance_ratio_[2],digits = 5)))
@@ -549,9 +731,17 @@ means.iloc[2] = my_df[my_df['cluster'] == '2'].describe().loc['mean']
 
 
 ```{r}
-py$means %>% kable(row.names = 1:nrow(py$means)) %>%
-  kable_styling(full_width = FALSE)
+# py$means %>% kable(row.names = 1:nrow(py$means)) %>%
+#   kable_styling(full_width = FALSE) %>%
+#   scroll_box(width = "100%")
+
+
+datatable(py$means, rownames =  c("Cluster 1", "Cluster 2", "Cluster 3"), options = list(pageLength = 3, scrollX=T) )
+
 ```
+
+
+
 
 
 
