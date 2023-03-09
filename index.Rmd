@@ -729,6 +729,8 @@ means.iloc[2] = my_df[my_df['cluster'] == '2'].describe().loc['mean']
 
 
 
+### Results
+
 
 ```{r}
 # py$means %>% kable(row.names = 1:nrow(py$means)) %>%
@@ -742,13 +744,27 @@ datatable(py$means, rownames =  c("Cluster 1", "Cluster 2", "Cluster 3"), option
 
 
 
+All the clusters have values below 0.33, indicating that the songs most likely represent music and other non-speech-like tracks.
 
 
 
-- Cluster 1 has the highest energy and valence, indicating that these tracks are faster-paced, louder, and more positive (e.g., happy, cheerful, euphoric) than the other clusters. 
-- Cluster 2 has the highest acousticness, with a mean value of 0.5396875 over all the cluster's songs. Cluster 2 is also higher in danceability, indicating tracks with a faster tempo and beat intensity. 
-- Cluster 3 appears to be the lowest valence, with a mean of 0.2303227, indicating more negative trajectories (e.g., sadness, frustration, anger). 
-- All the clusters have values below 0.33, indicating that the songs most likely represent music and other non-speech-like tracks.
+
+- `Cluster 1` has the highest energy and valence, indicating that these tracks are faster-paced, louder, and more positive (e.g., happy, cheerful, euphoric) than the other clusters. 
+- `Cluster 2` has the highest acousticness, with a mean value of 0.5396875 over all the cluster's songs. Cluster 2 is also higher in danceability, indicating tracks with a faster tempo and beat intensity. 
+- `Cluster 3` appears to be the lowest valence, with a mean of 0.2303227, indicating more negative trajectories (e.g., sadness, frustration, anger). 
+
+
+-------------------------
+
+
+## Conclusion
+
+
+Through machine learning and collaborative filtering related approaches, we can break down and analyze a playlist to gain insights into listening preferences and habits while also reccomending similar taste in music. For example, if a playlist contains multiple songs from a particular artist, the algorithm may recommend similar artists that other users who like that artist also listen to.
+
+### Next Steps 
+
+An extended approach to this project includes using **Natural Language Processing** to track music. Essentially, NLP searches for any mentions of a particular artist or song in order to analyze what people are talking about online, on social media or blogs articles. New technologies can identify top keywords and terms that are related to a song, and then make recommendations of other songs that have similar terms through NLP. Essentially NLP can categorize songs into groups and give each track descriptive adjectives to further classify each individual song. 
 
 
 
