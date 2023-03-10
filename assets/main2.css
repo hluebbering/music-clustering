@@ -174,10 +174,10 @@ hr {
     background-color: hsl(228deg 14% 93%);
     text-shadow: 0.25px 0.25px 0.25px hsl(233deg 5% 26% / 85%), 0.35px 0.35px 0.35px hsl(233deg 5% 26% / 85%), 0 -1.1px 0px rgb(12 13 18 / 8%), 0 1.2px 0 rgb(255 255 255);
     color: hsl(233deg 5% 26%);
-    padding: 3pt 5pt;
+    padding: 3px 6px;
     font-weight: 300;
     font-family: 'Roboto';
-    line-height: 15pt;
+    line-height: 1;
 }
 
 .myhighlight4 {

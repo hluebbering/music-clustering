@@ -358,7 +358,7 @@ Below is a sample of the result when we query Spotify for the most similar artis
 
 ```{r}
 library(DT)
-datatable(py$links_dict%>% data.frame() %>% head(10), rownames = FALSE, options = list(pageLength = 3, scrollX=T) )
+datatable(py$links_dict%>% data.frame() %>% head(10), rownames = FALSE, options = list(pageLength = 3, scrollX=T, dom = 't') )
 
 
 # py$links_dict %>% data.frame() %>% head(3) %>% kable() %>% kable_styling() %>%
@@ -684,7 +684,7 @@ In the above code, we define a PCA instance to find two principal components det
 ```{r,echo=FALSE,eval=TRUE}
 cluster_labels = c()
 for (i in py$model$labels_) {
-  cluster_labels = append(x = cluster_labels, values = glue::glue("Group ", i))}
+  cluster_labels = append(x = cluster_labels, values = glue::glue("Group ", i+1))}
 x <- py$pca_result
 pcadf <- data.frame("x1" = x[,1], "x2" = x[,2], "labels"=cluster_labels)
 
@@ -738,20 +738,19 @@ means.iloc[2] = my_df[my_df['cluster'] == '2'].describe().loc['mean']
 #   scroll_box(width = "100%")
 
 
-datatable(py$means, rownames =  c("Cluster 1", "Cluster 2", "Cluster 3"), options = list(pageLength = 3, scrollX=T) )
+datatable(py$means, rownames =  c("Cluster 1", "Cluster 2", "Cluster 3"), options = list(pageLength = 3, scrollX=T, dom = 't') ) %>% formatRound(columns=1:7, digits=3) %>% formatRound(columns=4, digits=5)
 
 ```
 
 
 
-All the clusters have values below 0.33, indicating that the songs most likely represent music and other non-speech-like tracks.
+All the clusters have values below $0.33$, indicating that the songs most likely represent music and other non-speech-like tracks.
 
+<span class="myhighlight3" style="background: #030404 !important; color: white !important; text-shadow: 0.25px 0.25px 0.25px hsl(0deg 0% 45% / 85%), 0.35px 0.35px 0.35px hsl(0deg 0% 75% / 85%), 0 -1.1px 0px hsl(230deg 20% 60% / 8%), 0 1.2px 0 hsl(0deg 0% 31%);">Cluster 1</span> has the highest energy and valence, indicating that these tracks are faster-paced, louder, and more positive (e.g., happy, cheerful, euphoric) than the other clusters. 
 
+<span class="myhighlight3" style="background: #d6e491 !important;">Cluster 2</span> has the highest acousticness, with a mean value of $0.539$ over all the cluster's songs. Cluster 2 is also higher in danceability, indicating tracks with a faster tempo and beat intensity. 
 
-
-- `Cluster 1` has the highest energy and valence, indicating that these tracks are faster-paced, louder, and more positive (e.g., happy, cheerful, euphoric) than the other clusters. 
-- `Cluster 2` has the highest acousticness, with a mean value of 0.5396875 over all the cluster's songs. Cluster 2 is also higher in danceability, indicating tracks with a faster tempo and beat intensity. 
-- `Cluster 3` appears to be the lowest valence, with a mean of 0.2303227, indicating more negative trajectories (e.g., sadness, frustration, anger). 
+<span class="myhighlight3" style="background: #ff99b1 !important;">Cluster 3</span> appears to be the lowest valence, with a mean of $0.2303$, indicating more negative trajectories (e.g., sadness, frustration, anger). 
 
 
 -------------------------
@@ -760,13 +759,12 @@ All the clusters have values below 0.33, indicating that the songs most likely r
 ## Conclusion
 
 
-Through machine learning and collaborative filtering-related approaches, we can break down and analyze a playlist to gain insights into listening preferences and habits while also recommending similar tastes in music. For example, if a playlist contains several songs from a particular artist, the algorithm may recommend similar artists based on the listening habits of other users with similar music tastes. 
+Through the use of machine learning and collaborative filtering techniques, we can analyze a playlist to gain insights into listening preferences and habits, and recommend music that aligns with similar tastes. For example, if a playlist contains several songs from a particular artist, the algorithm might suggest similar artists based on the listening habits of other users with similar music preferences.
 
 
 ### Next Steps 
 
-Future steps to this project include using Natural Language Processing to track music. NLP searches for mentions of a particular artist or song to analyze current trends and pop culture. New technologies can identify top keywords and terms related to a song and then make recommendations based on similar terms through NLP. Essentially NLP can categorize songs into groups and give each track descriptive adjectives to further classify individual songs. 
-
+To move forward with this project, we plan to incorporate **Natural Language Processing** (NLP) to track current music trends. NLP can search for mentions of a specific artist or song, then analyze those mentions to identify trends in popular culture. Using cutting-edge technology, NLP can identify popular keywords and phrases related to a particular song and provide recommendations based on similar terms. Ultimately, NLP can organize songs into groups and assign descriptive adjectives for each track, further classifying individual songs.
 
 
 
