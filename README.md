@@ -1,10 +1,17 @@
 # Data Programming with Python
-# Data Programming with Python
+
+<a href="https://www.data-card-for-spotify.com/card?user_id=hannahluebbering">
+  <img src="https://www.data-card-for-spotify.com/api/card?user_id=hannahluebbering&limit=3" alt="Data Card for Spotify">
+</a>
+
+
 
 
 ## Introduction
 
 The goal of this tutorial is to gain more experience writing and running Python code and programs and practice printing results to match a specification.
+
+
 
 
 ### Data Types
