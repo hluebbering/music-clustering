@@ -289,9 +289,9 @@ a.navbar-brand {
 
 .navbar.navbar-default.navbar-fixed-top::after {
     content: "";
-    /*background-image: url("static/track_header2.png");
-    background-image: url("trackssss.png");*/
-    background-size: 55%;
+    /*background-image: url("static/track_header2.png");*/
+    background-image: url("trackssss.png");
+    background-size: 75%;
     background-position: 25% 71% !important;
     opacity: 0.75;
     top: 0px;
